@@ -2,13 +2,12 @@
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
-from mpl_toolkits.mplot3d import Axes3D
 import control as ctrl
 from scipy.signal import TransferFunction, lsim
 import matplotlib.animation as ani
-import functools
 from IPython import display
 import sympy as sy
+import itertools
 
 def create_ground_points(x_range, y_range, z_range, num_points):
     x = np.linspace(x_range[0], x_range[1], num_points)
@@ -17,7 +16,24 @@ def create_ground_points(x_range, y_range, z_range, num_points):
     xx, yy,zz = np.meshgrid(x, y,z)
     points_world = np.stack([xx, yy, zz], axis=-1).reshape(-1, 3)
     return points_world
-
+def generateCoords(fovHor,fovVer,start,end):
+    xCoords = np.arange(start,end,0.1)
+    yCoordsMax = np.tan(np.radians(fovHor/2)) * end
+    yCoords = np.arange(0,yCoordsMax,0.1)
+    zCoords = np.array([5])
+    Coords = [xCoords,yCoords,zCoords]
+    allCoords = list(itertools.product(*Coords))
+    
+    filteredCoords = []
+    xVals,yVals = [],[]
+    for pos in allCoords:
+        horCheck = np.degrees(np.abs(np.arctan(pos[1]/pos[0])))
+        verCheck = np.degrees(np.abs(np.arctan(pos[2]/pos[0])))
+        if(horCheck <= fovHor/2 and verCheck<=fovVer/2):
+            filteredCoords.append(pos)
+            xVals.append(pos[0])
+            yVals.append(pos[1])
+    return filteredCoords,xVals,yVals
 def Spherical(x,y,z):
     azimuth = np.arctan(y/x)
     mod = np.sqrt(x**2 + y**2 + z**2)
@@ -49,6 +65,25 @@ def Analytical(dt,z,xVal,yVal,thetaVals,uVals):
   
 
     return Eval_dAzdU, Eval_dAzdTheta, Eval_dEledU,Eval_dEledTheta
+def FoVMaxComparison(dt,xVals,yVals,behaviour,t):
+    bestDAzDU, bestDAzDTheta, bestDEleDU, bestDEleDTheta =  np.zeros_like(t),np.zeros_like(t),np.zeros_like(t),np.zeros_like(t)
+    bestDAzDU_angle, bestDAzDTheta_angle, bestDEleDU_angle, bestDEleDTheta_angle = 0,0,0,0
+    for i,xVal in enumerate(xVals):
+        dAzdU, dAzdTheta, dEledU,dEledTheta = Analytical(dt,-5,xVal,yVals[i],behaviour["Theta"],behaviour["U"])
+        viewingAngle = np.degrees(np.arctan(yVals[i]/xVal))
+        if np.mean(dAzdU) > np.mean(bestDAzDU):
+            bestDAzDU = dAzdU
+            bestDAzDU_angle = viewingAngle
+        if np.mean(dAzdTheta) > np.mean(bestDAzDTheta):
+            bestDAzDTheta = dAzdTheta
+            bestDAzDTheta_angle = viewingAngle
+        if np.mean(dEledU) > np.mean(bestDEleDU):
+            bestDEleDU = dEledU
+            bestDEleDU_angle = viewingAngle
+        if np.mean(dEledTheta) > np.mean(bestDEleDTheta):
+            bestDEleDTheta = dEledTheta
+            bestDEleDTheta_angle = viewingAngle                    
+    return bestDAzDU, bestDAzDTheta, bestDEleDU, bestDEleDTheta,bestDAzDU_angle, bestDAzDTheta_angle, bestDEleDU_angle, bestDEleDTheta_angle
 def FovComparison(dt,xVals,yVals,behaviour,nPoints,t):
     baseDAzDU, baseDAZDTheta, baseDEleDU, baseDEleDTheta =  np.zeros_like(t),np.zeros_like(t),np.zeros_like(t),np.zeros_like(t)
     for i,xVal in enumerate(xVals):
@@ -211,56 +246,56 @@ plt.legend()
 
 ## Analytical ##
 
-# Testing
-testX = 2
-testY = 2
-testTheta = np.radians(15)
-testU = 2
-dtTest =0.1
-dAzdU, dAzdTheta, dEledU,dEledTheta = Analytical(dtTest,-5,testX,testY,testTheta,testU)
+# # Testing
+# testX = 2
+# testY = 2
+# testTheta = np.radians(15)
+# testU = 2
+# dtTest =0.1
+# dAzdU, dAzdTheta, dEledU,dEledTheta = Analytical(dtTest,-5,testX,testY,testTheta,testU)
 
 
 
-fig_dAzDU = plt.figure(figure)
-figure+=1
-ax_dAZDU = fig_dAzDU.add_subplot(111)
-ax_dAZDU.set_title("Variation of dAzimuth_dU wrt FoV")
-ax_dAZDU.set_xlabel("Time [s]")
-ax_dAZDU.set_ylabel("dAzimuth_dU [rad s/ m]")
+# fig_dAzDU = plt.figure(figure)
+# figure+=1
+# ax_dAZDU = fig_dAzDU.add_subplot(111)
+# ax_dAZDU.set_title("Variation of dAzimuth_dU wrt FoV")
+# ax_dAZDU.set_xlabel("Time [s]")
+# ax_dAZDU.set_ylabel("dAzimuth_dU [rad s/ m]")
 
 
-fig_dAzDTheta = plt.figure(figure)
-figure+=1
-ax_dAZDTheta = fig_dAzDTheta.add_subplot(111)
-ax_dAZDTheta.set_title("Variation of dAzimuth_dTheta wrt FoV")
-ax_dAZDTheta.set_xlabel("Time [s]")
-ax_dAZDTheta.set_ylabel("dAzimuth_dTheta [-]")
+# fig_dAzDTheta = plt.figure(figure)
+# figure+=1
+# ax_dAZDTheta = fig_dAzDTheta.add_subplot(111)
+# ax_dAZDTheta.set_title("Variation of dAzimuth_dTheta wrt FoV")
+# ax_dAZDTheta.set_xlabel("Time [s]")
+# ax_dAZDTheta.set_ylabel("dAzimuth_dTheta [-]")
 
 
-fig_dEleDU = plt.figure(figure)
-figure+=1
-ax_dEleDU = fig_dEleDU.add_subplot(111)
-ax_dEleDU.set_title("Variation of dElevation_dU wrt FoV")
-ax_dEleDU.set_xlabel("Time [s]")
-ax_dEleDU.set_ylabel("dElevation_dU [rad s/ m]")
+# fig_dEleDU = plt.figure(figure)
+# figure+=1
+# ax_dEleDU = fig_dEleDU.add_subplot(111)
+# ax_dEleDU.set_title("Variation of dElevation_dU wrt FoV")
+# ax_dEleDU.set_xlabel("Time [s]")
+# ax_dEleDU.set_ylabel("dElevation_dU [rad s/ m]")
 
 
-fig_dEleDTheta = plt.figure(figure)
-figure+=1
-ax_dEleDTheta = fig_dEleDTheta.add_subplot(111)
-ax_dEleDTheta.set_title("Variation of dElevation_dTheta wrt FoV")
-ax_dEleDTheta.set_xlabel("Time [s]")
-ax_dEleDTheta.set_ylabel("dElevation_dTheta [-]")
+# fig_dEleDTheta = plt.figure(figure)
+# figure+=1
+# ax_dEleDTheta = fig_dEleDTheta.add_subplot(111)
+# ax_dEleDTheta.set_title("Variation of dElevation_dTheta wrt FoV")
+# ax_dEleDTheta.set_xlabel("Time [s]")
+# ax_dEleDTheta.set_ylabel("dElevation_dTheta [-]")
 
 
 
 baseCase = np.array([1,1,-5])
 xVals = np.linspace(xRange[0], xRange[1], nPoints)
 FoVRange = np.arange(10,160,10)
-allDAzDu = []
-allDAzDTheta = []
-allDEleDU = []
-allDEleDTheta = []
+# allDAzDu = []
+# allDAzDTheta = []
+# allDEleDU = []
+# allDEleDTheta = []
 colors = [
     (255, 0, 0),       # Red
     (0, 255, 0),       # Green
@@ -280,51 +315,107 @@ colors = [
 ]
 
 colors= [(r/255, g/255, b/255) for r, g, b in colors]
-for i,angle in enumerate(FoVRange):
-    yVals = xVals * np.tan(np.radians(angle/2))
-    meanDAzDU,meanDAzDTheta,meanDEleDU,meanDEleDTheta = FovComparison(dt,xVals,yVals,behaviour,nPoints,t)
-    allDAzDu.append(meanDAzDU)
-    allDAzDTheta.append(meanDAzDTheta)
-    allDEleDU.append(meanDEleDU)
-    allDEleDTheta.append(meanDEleDTheta)
-    ax_dAZDU.plot(t,meanDAzDU,label=angle,color=colors[i])
-    ax_dAZDTheta.plot(t,meanDAzDTheta,label=angle,color=colors[i])
-    ax_dEleDU.plot(t,meanDEleDU,label=angle,color=colors[i])
-    ax_dEleDTheta.plot(t,meanDEleDTheta,label=angle,color=colors[i]) 
+# for i,angle in enumerate(FoVRange):
+#     yVals = xVals * np.tan(np.radians(angle/2))
+#     meanDAzDU,meanDAzDTheta,meanDEleDU,meanDEleDTheta = FovComparison(dt,xVals,yVals,behaviour,nPoints,t)
+#     allDAzDu.append(meanDAzDU)
+#     allDAzDTheta.append(meanDAzDTheta)
+#     allDEleDU.append(meanDEleDU)
+#     allDEleDTheta.append(meanDEleDTheta)
+#     ax_dAZDU.plot(t,meanDAzDU,label=angle,color=colors[i])
+#     ax_dAZDTheta.plot(t,meanDAzDTheta,label=angle,color=colors[i])
+#     ax_dEleDU.plot(t,meanDEleDU,label=angle,color=colors[i])
+#     ax_dEleDTheta.plot(t,meanDEleDTheta,label=angle,color=colors[i]) 
 
-ax_dAZDU.legend()    
-ax_dAZDTheta.legend()   
-ax_dEleDU.legend()
-ax_dEleDTheta.legend()
-fig_dAzDU.savefig("Visuals/dAzDU.png")
-fig_dAzDTheta.savefig("Visuals/dAzDTheta.png")
-fig_dEleDTheta.savefig("Visuals/dEleDTheta.png")
-fig_dEleDU.savefig("Visuals/dEleDU.png")
+# ax_dAZDU.legend()    
+# ax_dAZDTheta.legend()   
+# ax_dEleDU.legend()
+# ax_dEleDTheta.legend()
+# fig_dAzDU.savefig("Visuals/dAzDU.png")
+# fig_dAzDTheta.savefig("Visuals/dAzDTheta.png")
+# fig_dEleDTheta.savefig("Visuals/dEleDTheta.png")
+# fig_dEleDU.savefig("Visuals/dEleDU.png")
 
-allMeans_dAzDU=[0]
-allMeans_dAzDTheta=[0]
-allMeans_dEleDU=[0]
-allMeans_dEleDTheta=[0]
-plt.figure(figure)
+# allMeans_dAzDU=[0]
+# allMeans_dAzDTheta=[0]
+# allMeans_dEleDU=[0]
+# allMeans_dEleDTheta=[0]
+# plt.figure(figure)
+# figure+=1
+# plt.title("Difference between mean values for FoVs")
+# plt.ylabel("Difference")
+# plt.xlabel("FoV (deg)")
+# for i in range(1,len(allDAzDu)):
+#     m = allDAzDu[i] - allDAzDu[0]
+#     allMeans_dAzDU.append(np.mean(m))
+#     m = allDAzDTheta[i] - allDAzDTheta[0]
+#     allMeans_dAzDTheta.append(np.mean(m)) 
+#     m = allDEleDU[i] - allDEleDU[0]
+#     allMeans_dEleDU.append(np.mean(m))   
+#     m = allDEleDTheta[i] - allDEleDTheta[0]
+#     allMeans_dEleDTheta.append(np.mean(m))   
+# plt.plot(FoVRange,allMeans_dAzDU,label="dAz_dU",marker = "x")
+# plt.plot(FoVRange,allMeans_dAzDTheta,label="dAz_dTheta",marker = "x")
+# plt.plot(FoVRange,allMeans_dEleDU,label="dEle_dU",marker = "x")
+# plt.plot(FoVRange,allMeans_dEleDTheta,label="dEle_dTheta",marker = "x")
+# plt.legend()
+# plt.savefig("Visuals/FOVBehaviour_sine")
+
+# Checking max movement
+fig_dAzDU = plt.figure(figure)
 figure+=1
-plt.title("Difference between mean values for FoVs")
-plt.ylabel("Difference")
-plt.xlabel("FoV (deg)")
-for i in range(1,len(allDAzDu)):
-    m = allDAzDu[i] - allDAzDu[0]
-    allMeans_dAzDU.append(np.mean(m))
-    m = allDAzDTheta[i] - allDAzDTheta[0]
-    allMeans_dAzDTheta.append(np.mean(m)) 
-    m = allDEleDU[i] - allDEleDU[0]
-    allMeans_dEleDU.append(np.mean(m))   
-    m = allDEleDTheta[i] - allDEleDTheta[0]
-    allMeans_dEleDTheta.append(np.mean(m))   
-plt.plot(FoVRange,allMeans_dAzDU,label="dAz_dU",marker = "x")
-plt.plot(FoVRange,allMeans_dAzDTheta,label="dAz_dTheta",marker = "x")
-plt.plot(FoVRange,allMeans_dEleDU,label="dEle_dU",marker = "x")
-plt.plot(FoVRange,allMeans_dEleDTheta,label="dEle_dTheta",marker = "x")
-plt.legend()
-plt.savefig("Visuals/FOVBehaviour_sine")
+ax_best_dAZDU = fig_dAzDU.add_subplot(111)
+ax_best_dAZDU.set_title("Best dAzimuth_dU wrt FoV")
+ax_best_dAZDU.set_xlabel("Time [s]")
+ax_best_dAZDU.set_ylabel("dAzimuth_dU [rad s/ m]")
+
+
+fig_dAzDTheta = plt.figure(figure)
+figure+=1
+ax_best_dAZDTheta = fig_dAzDTheta.add_subplot(111)
+ax_best_dAZDTheta.set_title("Best dAzimuth_dTheta wrt FoV")
+ax_best_dAZDTheta.set_xlabel("Time [s]")
+ax_best_dAZDTheta.set_ylabel("dAzimuth_dTheta [-]")
+
+
+fig_dEleDU = plt.figure(figure)
+figure+=1
+ax_best_dEleDU = fig_dEleDU.add_subplot(111)
+ax_best_dEleDU.set_title("Best dElevation_dU wrt FoV")
+ax_best_dEleDU.set_xlabel("Time [s]")
+ax_best_dEleDU.set_ylabel("dElevation_dU [rad s/ m]")
+
+
+fig_dEleDTheta = plt.figure(figure)
+figure+=1
+ax_best_dEleDTheta = fig_dEleDTheta.add_subplot(111)
+ax_best_dEleDTheta.set_title("Best dElevation_dTheta wrt FoV")
+ax_best_dEleDTheta.set_xlabel("Time [s]")
+ax_best_dEleDTheta.set_ylabel("dElevation_dTheta [-]")
+best_DAzDu = []
+best_DAzDTheta = []
+best_DEleDU = []
+best_DEleDTheta = []
+for i,angle in enumerate(FoVRange):
+    print("analysing: ", angle)
+    allCoords,allX,allY = generateCoords(angle,100,xRange[0],xRange[1])
+    bestDAzDU, bestDAzDTheta, bestDEleDU, bestDEleDTheta,\
+    bestDAzDU_angle, bestDAzDTheta_angle, bestDEleDU_angle, bestDEleDTheta_angle = FoVMaxComparison(dt,allX,allY,behaviour,t)
+    best_DAzDu.append(bestDAzDU)
+    best_DAzDTheta.append(bestDAzDTheta)
+    best_DEleDU.append(bestDEleDU)
+    best_DEleDTheta.append(bestDEleDTheta)
+    ax_best_dAZDU.plot(t,bestDAzDU,label="FoV: "+str(angle) + " Viewing Angle: "+ str(bestDAzDU_angle),color=colors[i])
+    ax_best_dAZDTheta.plot(t,bestDAzDTheta,label="FoV: "+str(angle) + " Viewing Angle: "+ str(bestDAzDTheta_angle),color=colors[i])
+    ax_best_dEleDU.plot(t,bestDEleDU,label="FoV: "+str(angle) + " Viewing Angle: "+ str(bestDEleDU_angle),color=colors[i])
+    ax_best_dEleDTheta.plot(t,bestDEleDTheta,label="FoV: "+str(angle) + " Viewing Angle: "+ str(bestDEleDTheta_angle),color=colors[i])     
+
+ax_best_dAZDU.legend()    
+ax_best_dAZDTheta.legend()   
+ax_best_dEleDU.legend()
+ax_best_dEleDTheta.legend()
+
+
 plt.show() 
 exit()
 fig = plt.figure()
