@@ -70,7 +70,7 @@ def FoVMaxComparison(dt,xVals,yVals,behaviour,t):
     bestDAzDU_angle, bestDAzDTheta_angle, bestDEleDU_angle, bestDEleDTheta_angle = 0,0,0,0
     for i,xVal in enumerate(xVals):
         dAzdU, dAzdTheta, dEledU,dEledTheta = Analytical(dt,-5,xVal,yVals[i],behaviour["Theta"],behaviour["U"])
-        viewingAngle = np.degrees(np.arctan(yVals[i]/xVal))
+        viewingAngle = np.round(np.degrees(np.arctan(yVals[i]/xVal)))
         if np.mean(dAzdU) > np.mean(bestDAzDU):
             bestDAzDU = dAzdU
             bestDAzDU_angle = viewingAngle
@@ -198,7 +198,7 @@ XU = -0.02
 g = 9.80665
 XQ = 0.6674
 observerOrigin = np.array([0,0,0])
-xRange = (1, 5)  # X range on the ground
+xRange = (1, 10)  # X range on the ground
 yRange = (-27, 27)  # Y range on the ground
 zHeight = (-5,-5)  # Z height for ground plane
 nPoints = 20 # Number of points in each dimension
@@ -410,11 +410,18 @@ for i,angle in enumerate(FoVRange):
     ax_best_dEleDU.plot(t,bestDEleDU,label="FoV: "+str(angle) + " Viewing Angle: "+ str(bestDEleDU_angle),color=colors[i])
     ax_best_dEleDTheta.plot(t,bestDEleDTheta,label="FoV: "+str(angle) + " Viewing Angle: "+ str(bestDEleDTheta_angle),color=colors[i])     
 
-ax_best_dAZDU.legend()    
-ax_best_dAZDTheta.legend()   
-ax_best_dEleDU.legend()
-ax_best_dEleDTheta.legend()
-
+ax_best_dAZDU.legend(bbox_to_anchor=(1.05, 1), loc='upper left')    
+ax_best_dAZDTheta.legend(bbox_to_anchor=(1.05, 1), loc='upper left')   
+ax_best_dEleDU.legend(bbox_to_anchor=(1.05, 1), loc='upper left')
+ax_best_dEleDTheta.legend(bbox_to_anchor=(1.05, 1), loc='upper left')
+fig_dAzDU.tight_layout()
+fig_dAzDTheta.tight_layout()
+fig_dEleDU.tight_layout()
+fig_dEleDTheta.tight_layout()
+fig_dAzDU.savefig("Visuals/dAzDU_best.png")
+fig_dAzDTheta.savefig("Visuals/dAzDTheta_best.png")
+fig_dEleDTheta.savefig("Visuals/dEleDTheta_best.png")
+fig_dEleDU.savefig("Visuals/dEleDU_best.png")
 
 plt.show() 
 exit()
