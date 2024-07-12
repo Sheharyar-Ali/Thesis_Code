@@ -46,9 +46,36 @@ def Analytical(dt,z,xVal,yVal,thetaVals,uVals):
     Eval_dAzdTheta = dAz_dTheta(xVal,yVal,thetaVals,uVals)
     Eval_dEledU = dEle_dU(xVal,yVal,thetaVals,uVals)
     Eval_dEledTheta = dEle_dTheta(xVal,yVal,thetaVals,uVals)
-  
-
     return Eval_dAzdU, Eval_dAzdTheta, Eval_dEledU,Eval_dEledTheta
+
+def Analytical(deltaT,z,xVal,yVal,thetaVals,uVals):
+    x = sy.Symbol("x")
+    y = sy.Symbol("y")
+    # u = sy.Symbol("u")
+    # dt = sy.Symbol("dt")
+    dist = sy.Symbol("dist")
+    theta = sy.Symbol("theta")
+    Ry = np.array([[sy.cos(theta), 0, sy.sin(theta)],
+                   [0, 1, 0],
+                   [-sy.sin(theta), 0, sy.cos(theta)]])
+    PNew = Ry @ np.array([x,y,z]) - [dist,0,0]
+    Azimuth = sy.atan(PNew[1] / PNew[0])
+    modulus = sy.sqrt(PNew[0] **2 + PNew[1] **2 + PNew[2] **2)
+    Elevation = sy.acos(PNew[2] / modulus)
+    dAz_dU = sy.lambdify((x,y,theta,dist),Azimuth.diff(dist))
+    dEle_dU = sy.lambdify((x,y,theta,dist),Elevation.diff(dist))
+    dAz_dTheta = sy.lambdify((x,y,theta,dist),Azimuth.diff(theta))
+    dEle_dTheta = sy.lambdify((x,y,theta,dist),Elevation.diff(theta))
+
+
+    Eval_dAzdU = dAz_dU(xVal,yVal,thetaVals,uVals*deltaT)
+    Eval_dAzdTheta = dAz_dTheta(xVal,yVal,thetaVals,uVals*deltaT)
+    Eval_dEledU = dEle_dU(xVal,yVal,thetaVals,uVals*deltaT)
+    Eval_dEledTheta = dEle_dTheta(xVal,yVal,thetaVals,uVals*deltaT)
+    return Eval_dAzdU, Eval_dAzdTheta, Eval_dEledU,Eval_dEledTheta
+
+
+
 def FovComparison(dt,xVals,yVals,behaviour,nPoints,t):
     baseDAzDU, baseDAZDTheta, baseDEleDU, baseDEleDTheta =  np.zeros_like(t),np.zeros_like(t),np.zeros_like(t),np.zeros_like(t)
     for i,xVal in enumerate(xVals):
@@ -174,7 +201,7 @@ points_world = create_ground_points(xRange, yRange, zHeight, nPoints)
 
 t = np.linspace(0,4,600)
 dt = t[1] - t[0]
-input = -3/100 * np.sin((1/2 * 3)*np.pi*t)
+input = -1/100 * np.sin((1/2 * 3)*np.pi*t)
 # input = -1/100 * np.sin((1/2 * 10)*np.pi*t)
 # input = -1/100 * np.ones_like(t)
 # input[t<0.5] = 0
@@ -217,7 +244,7 @@ testY = 2
 testTheta = np.radians(15)
 testU = 2
 dtTest =0.1
-dAzdU, dAzdTheta, dEledU,dEledTheta = Analytical(dtTest,-5,testX,testY,testTheta,testU)
+dAzdU, dAzdTheta, dEledU,dEledTheta = Analytical(deltaT=dt,z=-5,xVal=testX,yVal=testY,thetaVals=testTheta,uVals=testU)
 
 
 
@@ -296,10 +323,10 @@ ax_dAZDU.legend()
 ax_dAZDTheta.legend()   
 ax_dEleDU.legend()
 ax_dEleDTheta.legend()
-fig_dAzDU.savefig("Visuals/dAzDU.png")
+fig_dAzDU.savefig("Visuals/dAzDUdt.png")
 fig_dAzDTheta.savefig("Visuals/dAzDTheta.png")
 fig_dEleDTheta.savefig("Visuals/dEleDTheta.png")
-fig_dEleDU.savefig("Visuals/dEleDU.png")
+fig_dEleDU.savefig("Visuals/dEleDUdt.png")
 
 allMeans_dAzDU=[0]
 allMeans_dAzDTheta=[0]
