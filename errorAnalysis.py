@@ -2,7 +2,7 @@
 import csv
 import matplotlib.pyplot as plt
 import numpy as np
-filename = "Heli_Sim/Assets/Scripts/export_sbinali_test_actual_140.csv"
+filename = "Heli_Sim/Assets/Scripts/export_sbinali_test_actual_20.csv"
 file = open(filename)
 Time=[]
 controlVelocity = []

@@ -283,46 +283,46 @@ dAzdU, dAzdTheta, dEledU,dEledTheta = Analytical(deltaT=dt,z=-5,xVal=testX,yVal=
 
 
 
-# fig_dAzDU = plt.figure(figure)
-# figure+=1
-# ax_dAZDU = fig_dAzDU.add_subplot(111)
-# ax_dAZDU.set_title("Variation of dAzimuth_dU wrt FoV")
-# ax_dAZDU.set_xlabel("Time [s]")
-# ax_dAZDU.set_ylabel("dAzimuth_dU [rad s/ m]")
+fig_dAzDU = plt.figure(figure)
+figure+=1
+ax_dAZDU = fig_dAzDU.add_subplot(111)
+ax_dAZDU.set_title("Variation of dAzimuth_d(Udt) wrt FoV")
+ax_dAZDU.set_xlabel("Time [s]")
+ax_dAZDU.set_ylabel("dAzimuth_d(Udt) [rad / m]")
 
 
-# fig_dAzDTheta = plt.figure(figure)
-# figure+=1
-# ax_dAZDTheta = fig_dAzDTheta.add_subplot(111)
-# ax_dAZDTheta.set_title("Variation of dAzimuth_dTheta wrt FoV")
-# ax_dAZDTheta.set_xlabel("Time [s]")
-# ax_dAZDTheta.set_ylabel("dAzimuth_dTheta [-]")
+fig_dAzDTheta = plt.figure(figure)
+figure+=1
+ax_dAZDTheta = fig_dAzDTheta.add_subplot(111)
+ax_dAZDTheta.set_title("Variation of dAzimuth_dTheta wrt FoV")
+ax_dAZDTheta.set_xlabel("Time [s]")
+ax_dAZDTheta.set_ylabel("dAzimuth_dTheta [-]")
 
 
-# fig_dEleDU = plt.figure(figure)
-# figure+=1
-# ax_dEleDU = fig_dEleDU.add_subplot(111)
-# ax_dEleDU.set_title("Variation of dElevation_dU wrt FoV")
-# ax_dEleDU.set_xlabel("Time [s]")
-# ax_dEleDU.set_ylabel("dElevation_dU [rad s/ m]")
+fig_dEleDU = plt.figure(figure)
+figure+=1
+ax_dEleDU = fig_dEleDU.add_subplot(111)
+ax_dEleDU.set_title("Variation of dElevation_d(Udt) wrt FoV")
+ax_dEleDU.set_xlabel("Time [s]")
+ax_dEleDU.set_ylabel("dElevation_d(Udt) [rad / m]")
 
 
-# fig_dEleDTheta = plt.figure(figure)
-# figure+=1
-# ax_dEleDTheta = fig_dEleDTheta.add_subplot(111)
-# ax_dEleDTheta.set_title("Variation of dElevation_dTheta wrt FoV")
-# ax_dEleDTheta.set_xlabel("Time [s]")
-# ax_dEleDTheta.set_ylabel("dElevation_dTheta [-]")
+fig_dEleDTheta = plt.figure(figure)
+figure+=1
+ax_dEleDTheta = fig_dEleDTheta.add_subplot(111)
+ax_dEleDTheta.set_title("Variation of dElevation_dTheta wrt FoV")
+ax_dEleDTheta.set_xlabel("Time [s]")
+ax_dEleDTheta.set_ylabel("dElevation_dTheta [-]")
 
 
 
 baseCase = np.array([1,1,-5])
 xVals = np.linspace(xRange[0], xRange[1], nPoints)
 FoVRange = np.arange(10,160,10)
-# allDAzDu = []
-# allDAzDTheta = []
-# allDEleDU = []
-# allDEleDTheta = []
+allDAzDu = []
+allDAzDTheta = []
+allDEleDU = []
+allDEleDTheta = []
 colors = [
     (255, 0, 0),       # Red
     (0, 255, 0),       # Green
@@ -342,52 +342,53 @@ colors = [
 ]
 
 colors= [(r/255, g/255, b/255) for r, g, b in colors]
-# for i,angle in enumerate(FoVRange):
-#     yVals = xVals * np.tan(np.radians(angle/2))
-#     meanDAzDU,meanDAzDTheta,meanDEleDU,meanDEleDTheta = FovComparison(dt,xVals,yVals,behaviour,nPoints,t)
-#     allDAzDu.append(meanDAzDU)
-#     allDAzDTheta.append(meanDAzDTheta)
-#     allDEleDU.append(meanDEleDU)
-#     allDEleDTheta.append(meanDEleDTheta)
-#     ax_dAZDU.plot(t,meanDAzDU,label=angle,color=colors[i])
-#     ax_dAZDTheta.plot(t,meanDAzDTheta,label=angle,color=colors[i])
-#     ax_dEleDU.plot(t,meanDEleDU,label=angle,color=colors[i])
-#     ax_dEleDTheta.plot(t,meanDEleDTheta,label=angle,color=colors[i]) 
+for i,angle in enumerate(FoVRange):
+    yVals = xVals * np.tan(np.radians(angle/2))
+    meanDAzDU,meanDAzDTheta,meanDEleDU,meanDEleDTheta = FovComparison(dt,xVals,yVals,behaviour,nPoints,t)
+    allDAzDu.append(meanDAzDU)
+    allDAzDTheta.append(meanDAzDTheta)
+    allDEleDU.append(meanDEleDU)
+    allDEleDTheta.append(meanDEleDTheta)
+    ax_dAZDU.plot(t,meanDAzDU,label=angle,color=colors[i])
+    ax_dAZDTheta.plot(t,meanDAzDTheta,label=angle,color=colors[i])
+    ax_dEleDU.plot(t,meanDEleDU,label=angle,color=colors[i])
+    ax_dEleDTheta.plot(t,meanDEleDTheta,label=angle,color=colors[i]) 
 
-# ax_dAZDU.legend()    
-# ax_dAZDTheta.legend()   
-# ax_dEleDU.legend()
-# ax_dEleDTheta.legend()
-# fig_dAzDU.savefig("Visuals/dAzDU.png")
-# fig_dAzDTheta.savefig("Visuals/dAzDTheta.png")
-# fig_dEleDTheta.savefig("Visuals/dEleDTheta.png")
-# fig_dEleDU.savefig("Visuals/dEleDU.png")
+ax_dAZDU.legend()    
+ax_dAZDTheta.legend()   
+ax_dEleDU.legend()
+ax_dEleDTheta.legend()
+fig_dAzDU.savefig("Visuals/dAzDUdt.png")
+fig_dAzDTheta.savefig("Visuals/dAzDTheta.png")
+fig_dEleDTheta.savefig("Visuals/dEleDTheta.png")
+fig_dEleDU.savefig("Visuals/dEleDUdt.png")
 
-# allMeans_dAzDU=[0]
-# allMeans_dAzDTheta=[0]
-# allMeans_dEleDU=[0]
-# allMeans_dEleDTheta=[0]
-# plt.figure(figure)
-# figure+=1
-# plt.title("Difference between mean values for FoVs")
-# plt.ylabel("Difference")
-# plt.xlabel("FoV (deg)")
-# for i in range(1,len(allDAzDu)):
-#     m = allDAzDu[i] - allDAzDu[0]
-#     allMeans_dAzDU.append(np.mean(m))
-#     m = allDAzDTheta[i] - allDAzDTheta[0]
-#     allMeans_dAzDTheta.append(np.mean(m)) 
-#     m = allDEleDU[i] - allDEleDU[0]
-#     allMeans_dEleDU.append(np.mean(m))   
-#     m = allDEleDTheta[i] - allDEleDTheta[0]
-#     allMeans_dEleDTheta.append(np.mean(m))   
-# plt.plot(FoVRange,allMeans_dAzDU,label="dAz_dU",marker = "x")
-# plt.plot(FoVRange,allMeans_dAzDTheta,label="dAz_dTheta",marker = "x")
-# plt.plot(FoVRange,allMeans_dEleDU,label="dEle_dU",marker = "x")
-# plt.plot(FoVRange,allMeans_dEleDTheta,label="dEle_dTheta",marker = "x")
-# plt.legend()
-# plt.savefig("Visuals/FOVBehaviour_sine")
-
+allMeans_dAzDU=[0]
+allMeans_dAzDTheta=[0]
+allMeans_dEleDU=[0]
+allMeans_dEleDTheta=[0]
+plt.figure(figure)
+figure+=1
+plt.title("Difference between mean values for FoVs")
+plt.ylabel("Difference")
+plt.xlabel("FoV (deg)")
+for i in range(1,len(allDAzDu)):
+    m = allDAzDu[i] - allDAzDu[0]
+    allMeans_dAzDU.append(np.mean(m))
+    m = allDAzDTheta[i] - allDAzDTheta[0]
+    allMeans_dAzDTheta.append(np.mean(m)) 
+    m = allDEleDU[i] - allDEleDU[0]
+    allMeans_dEleDU.append(np.mean(m))   
+    m = allDEleDTheta[i] - allDEleDTheta[0]
+    allMeans_dEleDTheta.append(np.mean(m))   
+plt.plot(FoVRange,allMeans_dAzDU,label="dAz_dU",marker = "x")
+plt.plot(FoVRange,allMeans_dAzDTheta,label="dAz_dTheta",marker = "x")
+plt.plot(FoVRange,allMeans_dEleDU,label="dEle_dU",marker = "x")
+plt.plot(FoVRange,allMeans_dEleDTheta,label="dEle_dTheta",marker = "x")
+plt.legend()
+plt.savefig("Visuals/FOVBehaviour_sine")
+plt.show()
+exit()
 # Checking max movement
 fig_dAzDU = plt.figure(figure)
 figure+=1
