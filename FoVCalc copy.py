@@ -16,10 +16,22 @@ def create_ground_points(x_range, y_range, z_range, num_points):
     xx, yy,zz = np.meshgrid(x, y,z)
     points_world = np.stack([xx, yy, zz], axis=-1).reshape(-1, 3)
     return points_world
-def generateCoords(fovHor,fovVer,start,end):
-    xCoords = np.arange(start,end,0.1)
+def generateCoords(fovHor,fovVer,start,end,step):
+    """Generate coordiantes within a specific horizontal Fov
+
+    Args:
+        fovHor (float): Horizontal fov in deg
+        fovVer (float): Vertical fov in deg
+        start (float): starting x-coordinate
+        end (float): ending x-coordinate
+        step (float): step of x range and y range
+
+    Returns:
+        list of cooridnates, list of x-coordinates, list of y-coordinates
+    """
+    xCoords = np.arange(start,end,step)
     yCoordsMax = np.tan(np.radians(fovHor/2)) * end
-    yCoords = np.arange(0,yCoordsMax,0.1)
+    yCoords = np.arange(0,yCoordsMax,step)
     zCoords = np.array([5])
     Coords = [xCoords,yCoords,zCoords]
     allCoords = list(itertools.product(*Coords))
@@ -40,29 +52,29 @@ def Spherical(x,y,z):
     elevation = np.arccos(z/mod)
     return np.array([np.degrees(azimuth),np.degrees(elevation)])
 
-def Analytical(dt,z,xVal,yVal,thetaVals,uVals):
-    x = sy.Symbol("x")
-    y = sy.Symbol("y")
-    u = sy.Symbol("u")
-    theta = sy.Symbol("theta")
-    Ry = np.array([[sy.cos(theta), 0, sy.sin(theta)],
-                   [0, 1, 0],
-                   [-sy.sin(theta), 0, sy.cos(theta)]])
-    PNew = Ry @ np.array([x,y,z]) - [u*dt ,0,0]
-    Azimuth = sy.atan(PNew[1] / PNew[0])
-    modulus = sy.sqrt(PNew[0] **2 + PNew[1] **2 + PNew[2] **2)
-    Elevation = sy.acos(PNew[2] / modulus)
-    dAz_dU = sy.lambdify((x,y,theta,u),Azimuth.diff(u))
-    dEle_dU = sy.lambdify((x,y,theta,u),Elevation.diff(u))
-    dAz_dTheta = sy.lambdify((x,y,theta,u),Azimuth.diff(theta))
-    dEle_dTheta = sy.lambdify((x,y,theta,u),Elevation.diff(theta))
+# def Analytical(dt,z,xVal,yVal,thetaVals,uVals):
+#     x = sy.Symbol("x")
+#     y = sy.Symbol("y")
+#     u = sy.Symbol("u")
+#     theta = sy.Symbol("theta")
+#     Ry = np.array([[sy.cos(theta), 0, sy.sin(theta)],
+#                    [0, 1, 0],
+#                    [-sy.sin(theta), 0, sy.cos(theta)]])
+#     PNew = Ry @ np.array([x,y,z]) - [u*dt ,0,0]
+#     Azimuth = sy.atan(PNew[1] / PNew[0])
+#     modulus = sy.sqrt(PNew[0] **2 + PNew[1] **2 + PNew[2] **2)
+#     Elevation = sy.acos(PNew[2] / modulus)
+#     dAz_dU = sy.lambdify((x,y,theta,u),Azimuth.diff(u))
+#     dEle_dU = sy.lambdify((x,y,theta,u),Elevation.diff(u))
+#     dAz_dTheta = sy.lambdify((x,y,theta,u),Azimuth.diff(theta))
+#     dEle_dTheta = sy.lambdify((x,y,theta,u),Elevation.diff(theta))
 
 
-    Eval_dAzdU = dAz_dU(xVal,yVal,thetaVals,uVals)
-    Eval_dAzdTheta = dAz_dTheta(xVal,yVal,thetaVals,uVals)
-    Eval_dEledU = dEle_dU(xVal,yVal,thetaVals,uVals)
-    Eval_dEledTheta = dEle_dTheta(xVal,yVal,thetaVals,uVals)
-    return Eval_dAzdU, Eval_dAzdTheta, Eval_dEledU,Eval_dEledTheta
+#     Eval_dAzdU = dAz_dU(xVal,yVal,thetaVals,uVals)
+#     Eval_dAzdTheta = dAz_dTheta(xVal,yVal,thetaVals,uVals)
+#     Eval_dEledU = dEle_dU(xVal,yVal,thetaVals,uVals)
+#     Eval_dEledTheta = dEle_dTheta(xVal,yVal,thetaVals,uVals)
+#     return Eval_dAzdU, Eval_dAzdTheta, Eval_dEledU,Eval_dEledTheta
 
 def Analytical(deltaT,z,xVal,yVal,thetaVals,uVals):
     x = sy.Symbol("x")
@@ -212,7 +224,7 @@ def updateValues(frame,df):
     return quivers + [textU, textTheta,textTime]
 
 
-
+## Setup
 r=0.017
 MTheta1s = 26.4
 MQ = -1.8954
@@ -230,7 +242,7 @@ points_world = create_ground_points(xRange, yRange, zHeight, nPoints)
 
 
 
-
+## Create input
 t = np.linspace(0,4,600)
 dt = t[1] - t[0]
 input = -1/100 * np.sin((1/2 * 3)*np.pi*t)
@@ -269,10 +281,9 @@ plt.xlabel('Time [s]')
 plt.ylabel('U [m/s]')
 plt.savefig("Visuals/U")
 plt.legend()
-
+plt.close('all')
 
 ## Analytical ##
-
 # Testing
 testX = 2
 testY = 2
@@ -282,7 +293,63 @@ dtTest =0.1
 dAzdU, dAzdTheta, dEledU,dEledTheta = Analytical(deltaT=dt,z=-5,xVal=testX,yVal=testY,thetaVals=testTheta,uVals=testU)
 
 
+## Set up figures for analysing one Fov
+fig_dAzDU = plt.figure(figure)
+figure+=1
+ax_dAZDU = fig_dAzDU.add_subplot(111)
+ax_dAZDU.set_title("Variation of dAzimuth_d(Udt) wrt x and y for Fov = 140 deg")
+ax_dAZDU.set_xlabel("Time [s]")
+ax_dAZDU.set_ylabel("dAzimuth_d(Udt) [rad / m]")
 
+
+fig_dAzDTheta = plt.figure(figure)
+figure+=1
+ax_dAZDTheta = fig_dAzDTheta.add_subplot(111)
+ax_dAZDTheta.set_title("Variation of dAzimuth_dTheta wrt x and y for Fov = 140 deg")
+ax_dAZDTheta.set_xlabel("Time [s]")
+ax_dAZDTheta.set_ylabel("dAzimuth_dTheta [-]")
+
+
+fig_dEleDU = plt.figure(figure)
+figure+=1
+ax_dEleDU = fig_dEleDU.add_subplot(111)
+ax_dEleDU.set_title("Variation of dElevation_d(Udt) wrt x and y for Fov = 140 deg")
+ax_dEleDU.set_xlabel("Time [s]")
+ax_dEleDU.set_ylabel("dElevation_d(Udt) [rad / m]")
+
+
+fig_dEleDTheta = plt.figure(figure)
+figure+=1
+ax_dEleDTheta = fig_dEleDTheta.add_subplot(111)
+ax_dEleDTheta.set_title("Variation of dElevation_dTheta wrt x and y for Fov = 140 deg")
+ax_dEleDTheta.set_xlabel("Time [s]")
+ax_dEleDTheta.set_ylabel("dElevation_dTheta [-]")
+
+
+xVals = np.arange(xRange[0],xRange[1]+1,1)
+yVals = xVals * np.tan(140/2)
+for i,xPos in enumerate(xVals):
+    dAzdU, dAzdTheta, dEledU,dEledTheta = Analytical(deltaT=dt,z=-5,xVal=xPos,yVal=yVals[i],thetaVals=behaviour["Theta"],uVals=behaviour["U"])
+    yVals[i] = round(yVals[i],2)
+    ax_dAZDU.plot(t,dAzdU,label="x=" + str(xPos) + " y=" + str(yVals[i]))
+    ax_dAZDTheta.plot(t,dAzdTheta,label="x=" + str(xPos) + " y=" + str(yVals[i]))
+    ax_dEleDU.plot(t,dEledU,label="x=" + str(xPos) + " y=" + str(yVals[i]))
+    ax_dEleDTheta.plot(t,dEledTheta,label="x=" + str(xPos) + " y=" + str(yVals[i])) 
+    
+ax_dAZDU.legend()    
+ax_dAZDTheta.legend()   
+ax_dEleDU.legend()
+ax_dEleDTheta.legend()
+fig_dAzDU.savefig("Visuals/dAzDUdt_fov140.png")
+fig_dAzDTheta.savefig("Visuals/dAzDTheta_fov140.png")
+fig_dEleDTheta.savefig("Visuals/dEleDTheta_fov140.png")
+fig_dEleDU.savefig("Visuals/dEleDUdt_fov140.png")    
+# plt.show()
+# exit()
+plt.close('all')
+
+
+## Set up figures for FoV Comparison
 fig_dAzDU = plt.figure(figure)
 figure+=1
 ax_dAZDU = fig_dAzDU.add_subplot(111)
@@ -349,10 +416,10 @@ for i,angle in enumerate(FoVRange):
     allDAzDTheta.append(meanDAzDTheta)
     allDEleDU.append(meanDEleDU)
     allDEleDTheta.append(meanDEleDTheta)
-    ax_dAZDU.plot(t,meanDAzDU,label=angle,color=colors[i])
-    ax_dAZDTheta.plot(t,meanDAzDTheta,label=angle,color=colors[i])
-    ax_dEleDU.plot(t,meanDEleDU,label=angle,color=colors[i])
-    ax_dEleDTheta.plot(t,meanDEleDTheta,label=angle,color=colors[i]) 
+    ax_dAZDU.plot(t,meanDAzDU,label=str(angle) + " deg",color=colors[i])
+    ax_dAZDTheta.plot(t,meanDAzDTheta,label=str(angle) + " deg",color=colors[i])
+    ax_dEleDU.plot(t,meanDEleDU,label=str(angle) + " deg",color=colors[i])
+    ax_dEleDTheta.plot(t,meanDEleDTheta,label=str(angle) + " deg",color=colors[i]) 
 
 ax_dAZDU.legend()    
 ax_dAZDTheta.legend()   
@@ -389,7 +456,10 @@ plt.legend()
 plt.savefig("Visuals/FOVBehaviour_sine")
 plt.show()
 exit()
-# Checking max movement
+plt.close('all')
+
+
+# Setting up figures for max movement analysis
 fig_dAzDU = plt.figure(figure)
 figure+=1
 ax_best_dAZDU = fig_dAzDU.add_subplot(111)
@@ -426,7 +496,7 @@ best_DEleDU = []
 best_DEleDTheta = []
 for i,angle in enumerate(FoVRange):
     print("analysing: ", angle)
-    allCoords,allX,allY = generateCoords(angle,100,xRange[0],xRange[1])
+    allCoords,allX,allY = generateCoords(angle,100,xRange[0],xRange[1],0.1)
     bestDAzDU, bestDAzDTheta, bestDEleDU, bestDEleDTheta,\
     bestDAzDU_angle, bestDAzDTheta_angle, bestDEleDU_angle, bestDEleDTheta_angle = FoVMaxComparison(dt,allX,allY,behaviour,t)
     best_DAzDu.append(bestDAzDU)
@@ -453,6 +523,9 @@ fig_dEleDU.savefig("Visuals/dEleDU_best.png")
 
 plt.show() 
 exit()
+plt.close('all')
+
+# Sphere plot
 fig = plt.figure()
 ax = fig.add_subplot(111, projection='3d')
 # Plot the sphere for reference
@@ -471,7 +544,7 @@ textTime = ax.text2D(0.05, 0.85, "", transform=ax.transAxes)
 textU = ax.text2D(0.05, 0.95, "", transform=ax.transAxes)
 textTheta = ax.text2D(0.05, 0.90, "", transform=ax.transAxes)
 
-
+## Saving sphere plot
 # anime = ani.FuncAnimation(fig,functools.partial(updateValues,df=behaviour),frames=len(t),blit=False)
 # #anime.save('animation.gif', writer='pillow', fps=10) 
 # writervideo = ani.PillowWriter(fps=60) 
