@@ -5,6 +5,7 @@ import control
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
+from scipy.signal import get_window
 
 fig_count = 1
 M_theta1s = 26.4
@@ -520,7 +521,7 @@ plt.legend()
 
 plt.figure(fig_count)
 fig_count+=1
-plt.title("Forcing Function")
+plt.title("Forcing Function with Lead in time")
 plt.ylabel("Velocity [m/s]")
 plt.xlabel("Time [s]")
 plt.plot(t[0:301],f_full[0:301],label="lead in")
@@ -533,7 +534,42 @@ plt.title("Forcing Function")
 plt.ylabel("Velocity [m/s]")
 plt.xlabel("Time [s]")
 plt.plot(t_m,f)
+info = pd.DataFrame({})
+info.insert(0,"forcing function",f_full)
+info.to_csv("Heli_Sim/Assets/Scripts/forcing_func.csv")
 
+#%%
+# Theta forcing function
+n_theta = [2, 5, 13, 23, 37, 51, 73, 103, 139, 171]
+w_theta = np.array(n_theta) * w_m
+A_theta_mult = 5
+A_theta =np.ones_like(w_theta) * A_theta_mult
+for i in range(0,len(A_theta)):
+    val = A_theta[i]
+    w = w_theta[i]
+    if w> w_i_outer:
+        A_theta[i] = val/10
+f_theta_d = []
+f_theta_lead_in = []
+f_theta=np.zeros_like(t_m)
+for i in range (0,len(w_d)): 
+    buffer =  A_theta[i] * np.sin(w_theta[i] * t_m  + phi_d[i])
+    f_theta_d.append(buffer)
+    f_theta+= f_theta_d[i]
+f_theta_lead_in = -1 * f_theta[0:300]
+f_theta_lead_in = f_theta_lead_in[::-1]
+f_theta_full = np.concatenate((f_theta_lead_in,f_theta))
+plt.figure(fig_count)
+fig_count+=1
+plt.title("Forcing Function Theta")
+plt.ylabel("Theta [deg]")
+plt.xlabel("Time [s]")
+plt.plot(t_m,f_theta)
+info_theta = pd.DataFrame({})
+info_theta.insert(0,"forcing function",f_theta_full)
+info_theta.to_csv("Heli_Sim/Assets/Scripts/forcing_func_theta.csv")
+#%%
+# Training functions
 n_d_training_1 = [5,11,23,37,51,71,101,137,171,226]
 w_d_training_1 = np.array(n_d_training_1) * w_m
 A_d_training_1 = np.ones_like(w_d_training_1) * A_multiplier
@@ -583,13 +619,31 @@ plt.plot(t[0:301],f_full_training_2[0:301],label="lead in_2")
 plt.plot(t[300:],f_full_training_2[300:],label="ff_2")
 plt.legend()
 
-
-info = pd.DataFrame({})
-info.insert(0,"forcing function",f_full)
-info.to_csv("Heli_Sim/Assets/Scripts/forcing_func.csv")
-
 training_info = pd.DataFrame({})
 training_info.insert(0,"training_1",f_full_training_1)
 training_info.insert(0,"training_2",f_full_training_2)
 training_info.to_csv("Heli_Sim/Assets/Scripts/training.csv")
+# %%
+#Check FFT for leakage
+n = len(f)
+fs = 10  # Sampling frequency is the inverse of the time step (0.1 seconds)
+fft_result = np.fft.fft(f)
+fft_freqs = np.fft.fftfreq(n, 1/fs)
+
+# Only take the positive frequencies
+fft_result = fft_result[:n // 2]
+fft_freqs = fft_freqs[:n // 2]
+
+# Calculate the magnitude
+fft_magnitude = np.abs(fft_result) / n
+
+# Plot the FFT result
+plt.figure(figsize=(12, 6))
+plt.plot(fft_freqs, fft_magnitude)
+plt.title("FFT of Forcing Function")
+plt.xlabel("Frequency (Hz)")
+plt.ylabel("Magnitude")
+plt.grid(True)
+plt.show()
+
 # %%
