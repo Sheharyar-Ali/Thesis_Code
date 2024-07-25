@@ -565,6 +565,16 @@ plt.title("Forcing Function Theta")
 plt.ylabel("Theta [deg]")
 plt.xlabel("Time [s]")
 plt.plot(t_m,f_theta)
+
+f_theta_full_diff = np.diff(np.array(f_theta_full))
+
+plt.figure(fig_count)
+fig_count+=1
+plt.title("Forcing Function Theta diff")
+plt.ylabel("Theta rate [deg/s]")
+plt.xlabel("Time [s]")
+plt.plot(t[0:-1],f_theta_full_diff)
+
 info_theta = pd.DataFrame({})
 info_theta.insert(0,"forcing function",f_theta_full)
 info_theta.to_csv("Heli_Sim/Assets/Scripts/forcing_func_theta.csv")

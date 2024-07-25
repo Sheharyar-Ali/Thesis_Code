@@ -2,7 +2,7 @@
 import csv
 import matplotlib.pyplot as plt
 import numpy as np
-filename = "Heli_Sim/Assets/Scripts/export_sbinali_test_actual_20.csv"
+filename = "Heli_Sim/Assets/Scripts/export_sbinali_test_actual_140.csv"
 file = open(filename)
 Time=[]
 controlVelocity = []
@@ -16,20 +16,32 @@ for row in csvreader:
         ffVelocity.append(float(row[2]))
         controlInput.append(float(row[3]))
 print("Done reading")
-Time = np.array(Time[300:])
-controlInput = np.array(controlInput[300:])
-controlVelocity = np.array(controlVelocity[300:])
-ffVelocity = np.array(ffVelocity[300:])
+print("Time length ", len(Time))
+Time = np.array(Time)
+controlInput = np.array(controlInput)
+controlVelocity = np.array(controlVelocity)
+ffVelocity = np.array(ffVelocity)
 heliVelocity = controlVelocity + ffVelocity
 error = np.zeros_like(Time) - heliVelocity
 rmse = np.sqrt(np.sum(error**2) / len(error))
 print(rmse)
-
 file.close()
+filename = "Heli_Sim/Assets/Scripts/forcing_func.csv"
+file = open(filename)
+ff=[]
+t= np.arange(0,150,0.1)
+csvreader = csv.reader(file)
+for row in csvreader:
+    if(row[1] != "forcing function"):
+        ff.append(float(row[1]))
+print("Done reading")
+file.close
+
 plt.figure(1)
 plt.title("Velocities")
 plt.plot(Time,controlVelocity,label="CV")
 plt.plot(Time,ffVelocity,label="FF")
+plt.plot(t,ff,label="actual")
 # plt.plot(Time,heliVelocity,label="total")
 plt.legend()
 
