@@ -2,7 +2,7 @@
 import csv
 import matplotlib.pyplot as plt
 import numpy as np
-filename = "Heli_Sim/Assets/Scripts/export_sbinali_test_actual_140.csv"
+filename = "Heli_Sim/Assets/Scripts/Data/export_sbinali_test_theta_140.csv"
 file = open(filename)
 Time=[]
 controlVelocity = []
@@ -26,7 +26,7 @@ error = np.zeros_like(Time) - heliVelocity
 rmse = np.sqrt(np.sum(error**2) / len(error))
 print(rmse)
 file.close()
-filename = "Heli_Sim/Assets/Scripts/forcing_func.csv"
+filename = "Heli_Sim/Assets/Scripts/forcing_func_theta.csv"
 file = open(filename)
 ff=[]
 t= np.arange(0,150,0.1)
