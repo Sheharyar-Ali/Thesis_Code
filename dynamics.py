@@ -540,7 +540,9 @@ info.to_csv("Heli_Sim/Assets/Scripts/forcing_func.csv")
 
 #%%
 # Theta forcing function
-n_theta = [2, 5, 13, 23, 37, 51, 73, 103, 139, 171]
+np.random.seed(25)
+phi_d = np.random.uniform(-2 * np.pi, 2 * np.pi, 10)
+n_theta = [2, 5, 13, 23, 37, 51, 73, 83, 97, 141]
 w_theta = np.array(n_theta) * w_m
 A_theta_mult = 5
 A_theta =np.ones_like(w_theta) * A_theta_mult
@@ -564,16 +566,10 @@ fig_count+=1
 plt.title("Forcing Function Theta")
 plt.ylabel("Theta [deg]")
 plt.xlabel("Time [s]")
-plt.plot(t_m,f_theta)
-
-f_theta_full_diff = np.diff(np.array(f_theta_full))
-
-plt.figure(fig_count)
-fig_count+=1
-plt.title("Forcing Function Theta diff")
-plt.ylabel("Theta rate [deg/s]")
-plt.xlabel("Time [s]")
-plt.plot(t[0:-1],f_theta_full_diff)
+# plt.plot(t_m,f_theta)
+plt.plot(t[0:301],f_theta_full[0:301],label="lead in")
+plt.plot(t[300:],f_theta_full[300:],label="ff")
+plt.legend()
 
 info_theta = pd.DataFrame({})
 info_theta.insert(0,"forcing function",f_theta_full)
