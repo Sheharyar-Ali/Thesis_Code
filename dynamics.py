@@ -540,9 +540,9 @@ info.to_csv("Heli_Sim/Assets/Scripts/forcing_func.csv")
 
 #%%
 # Theta forcing function
-np.random.seed(25)
+np.random.seed(1)
 phi_d = np.random.uniform(-2 * np.pi, 2 * np.pi, 10)
-n_theta = [2, 5, 13, 23, 37, 51, 73, 83, 97, 141]
+n_theta = [2, 5, 11, 23, 37, 51, 71, 83, 97, 137]
 w_theta = np.array(n_theta) * w_m
 A_theta_mult = 5
 A_theta =np.ones_like(w_theta) * A_theta_mult
