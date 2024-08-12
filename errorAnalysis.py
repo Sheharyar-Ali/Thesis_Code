@@ -3,7 +3,7 @@ import csv
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
-filename = "../Heli_Sim/Assets/Scripts/Data/export_pracc169,4549354,0737650,1796882,81981113,4561348,991578,856_actual_140.csv"
+filename = "Heli_Sim/Assets/Scripts/Data/export_pracc169,4549354,0737650,1796882,81981113,4561348,991578,856_actual_140.csv"
 file = open(filename)
 Time=[]
 controlVelocity = []
@@ -30,7 +30,7 @@ uDf.truncate(before=uDf[Time>=30].iloc[0,0])
 rmse = np.sqrt(np.sum(uDf["error"]**2) / len(uDf["error"]))
 print(rmse)
 file.close()
-filename = "../Heli_Sim/Assets/Scripts/forcing_func.csv"
+filename = "Heli_Sim/Assets/Scripts/forcing_func.csv"
 file = open(filename)
 ff=[]
 t= np.arange(0,150,0.1)
@@ -55,7 +55,7 @@ plt.plot(Time,error)
 
 #%%
 # Theta 
-filename = "../Heli_Sim/Assets/Scripts/Data/export_test152.3239_theta_140.csv"
+filename = "Heli_Sim/Assets/Scripts/Data/export_test152.3239_theta_140.csv"
 file = open(filename)
 Time=[]
 controlTheta = []
@@ -84,7 +84,7 @@ thetaDf.truncate(before=thetaDf[Time>=30].iloc[0,0])
 rmse = np.sqrt(np.sum(thetaDf["error"]**2) / len(thetaDf["error"]))
 print(rmse)
 file.close()
-filename = "../Heli_Sim/Assets/Scripts/forcing_func_theta.csv"
+filename = "Heli_Sim/Assets/Scripts/forcing_func_theta.csv"
 file = open(filename)
 ff=[]
 t= np.arange(0,150,0.1)
