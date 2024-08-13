@@ -4,7 +4,8 @@ import csv
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
-filename = "Heli_Sim/Assets/Scripts/Data/export_sb194,8627416,6201_theta_20.csv"
+folder = "Heli_Sim/Assets/Scripts/Data/"
+filename = folder + "export_veor164,9861361,7528596,258_actual_140.csv"
 file = open(filename)
 Time=[]
 controlTheta = []
