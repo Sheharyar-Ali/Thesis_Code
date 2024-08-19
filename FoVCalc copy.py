@@ -457,73 +457,75 @@ plt.legend()
 plt.savefig("Visuals/FOVBehaviour_sine")
 plt.show()
 plt.close('all')
+for i,angle in enumerate(FoVRange):
+    allCoords,allX,allY = generateCoords(angle,100,xRange[0],xRange[1],0.1)
+    print("angle ", angle, " points ", len(allCoords))
+
+# Setting up figures for max movement analysis
+fig_dAzDU = plt.figure(figure)
+figure+=1
+ax_best_dAZDU = fig_dAzDU.add_subplot(111)
+ax_best_dAZDU.set_title("Best dAzimuth_dU wrt FoV")
+ax_best_dAZDU.set_xlabel("Time [s]")
+ax_best_dAZDU.set_ylabel("dAzimuth_dU [rad s/ m]")
 
 
-# # Setting up figures for max movement analysis
-# fig_dAzDU = plt.figure(figure)
-# figure+=1
-# ax_best_dAZDU = fig_dAzDU.add_subplot(111)
-# ax_best_dAZDU.set_title("Best dAzimuth_dU wrt FoV")
-# ax_best_dAZDU.set_xlabel("Time [s]")
-# ax_best_dAZDU.set_ylabel("dAzimuth_dU [rad s/ m]")
+fig_dAzDTheta = plt.figure(figure)
+figure+=1
+ax_best_dAZDTheta = fig_dAzDTheta.add_subplot(111)
+ax_best_dAZDTheta.set_title("Best dAzimuth_dTheta wrt FoV")
+ax_best_dAZDTheta.set_xlabel("Time [s]")
+ax_best_dAZDTheta.set_ylabel("dAzimuth_dTheta [-]")
 
 
-# fig_dAzDTheta = plt.figure(figure)
-# figure+=1
-# ax_best_dAZDTheta = fig_dAzDTheta.add_subplot(111)
-# ax_best_dAZDTheta.set_title("Best dAzimuth_dTheta wrt FoV")
-# ax_best_dAZDTheta.set_xlabel("Time [s]")
-# ax_best_dAZDTheta.set_ylabel("dAzimuth_dTheta [-]")
+fig_dEleDU = plt.figure(figure)
+figure+=1
+ax_best_dEleDU = fig_dEleDU.add_subplot(111)
+ax_best_dEleDU.set_title("Best dElevation_dU wrt FoV")
+ax_best_dEleDU.set_xlabel("Time [s]")
+ax_best_dEleDU.set_ylabel("dElevation_dU [rad s/ m]")
 
 
-# fig_dEleDU = plt.figure(figure)
-# figure+=1
-# ax_best_dEleDU = fig_dEleDU.add_subplot(111)
-# ax_best_dEleDU.set_title("Best dElevation_dU wrt FoV")
-# ax_best_dEleDU.set_xlabel("Time [s]")
-# ax_best_dEleDU.set_ylabel("dElevation_dU [rad s/ m]")
+fig_dEleDTheta = plt.figure(figure)
+figure+=1
+ax_best_dEleDTheta = fig_dEleDTheta.add_subplot(111)
+ax_best_dEleDTheta.set_title("Best dElevation_dTheta wrt FoV")
+ax_best_dEleDTheta.set_xlabel("Time [s]")
+ax_best_dEleDTheta.set_ylabel("dElevation_dTheta [-]")
+best_DAzDu = []
+best_DAzDTheta = []
+best_DEleDU = []
+best_DEleDTheta = []
+for i,angle in enumerate(FoVRange):
+    print("analysing: ", angle)
+    allCoords,allX,allY = generateCoords(angle,100,xRange[0],xRange[1],0.1)
+    bestDAzDU, bestDAzDTheta, bestDEleDU, bestDEleDTheta,\
+    bestDAzDU_angle, bestDAzDTheta_angle, bestDEleDU_angle, bestDEleDTheta_angle = FoVMaxComparison(dt,allX,allY,behaviour,t)
+    best_DAzDu.append(bestDAzDU)
+    best_DAzDTheta.append(bestDAzDTheta)
+    best_DEleDU.append(bestDEleDU)
+    best_DEleDTheta.append(bestDEleDTheta)
+    ax_best_dAZDU.plot(t,bestDAzDU,label="FoV: "+str(angle) + " Viewing Angle: "+ str(bestDAzDU_angle),color=colors[i])
+    ax_best_dAZDTheta.plot(t,bestDAzDTheta,label="FoV: "+str(angle) + " Viewing Angle: "+ str(bestDAzDTheta_angle),color=colors[i])
+    ax_best_dEleDU.plot(t,bestDEleDU,label="FoV: "+str(angle) + " Viewing Angle: "+ str(bestDEleDU_angle),color=colors[i])
+    ax_best_dEleDTheta.plot(t,bestDEleDTheta,label="FoV: "+str(angle) + " Viewing Angle: "+ str(bestDEleDTheta_angle),color=colors[i])     
 
+ax_best_dAZDU.legend(bbox_to_anchor=(1.05, 1), loc='upper left')    
+ax_best_dAZDTheta.legend(bbox_to_anchor=(1.05, 1), loc='upper left')   
+ax_best_dEleDU.legend(bbox_to_anchor=(1.05, 1), loc='upper left')
+ax_best_dEleDTheta.legend(bbox_to_anchor=(1.05, 1), loc='upper left')
+fig_dAzDU.tight_layout()
+fig_dAzDTheta.tight_layout()
+fig_dEleDU.tight_layout()
+fig_dEleDTheta.tight_layout()
+fig_dAzDU.savefig("Visuals/dAzDU_best.png")
+fig_dAzDTheta.savefig("Visuals/dAzDTheta_best.png")
+fig_dEleDTheta.savefig("Visuals/dEleDTheta_best.png")
+fig_dEleDU.savefig("Visuals/dEleDU_best.png")
 
-# fig_dEleDTheta = plt.figure(figure)
-# figure+=1
-# ax_best_dEleDTheta = fig_dEleDTheta.add_subplot(111)
-# ax_best_dEleDTheta.set_title("Best dElevation_dTheta wrt FoV")
-# ax_best_dEleDTheta.set_xlabel("Time [s]")
-# ax_best_dEleDTheta.set_ylabel("dElevation_dTheta [-]")
-# best_DAzDu = []
-# best_DAzDTheta = []
-# best_DEleDU = []
-# best_DEleDTheta = []
-# for i,angle in enumerate(FoVRange):
-#     print("analysing: ", angle)
-#     allCoords,allX,allY = generateCoords(angle,100,xRange[0],xRange[1],0.1)
-#     bestDAzDU, bestDAzDTheta, bestDEleDU, bestDEleDTheta,\
-#     bestDAzDU_angle, bestDAzDTheta_angle, bestDEleDU_angle, bestDEleDTheta_angle = FoVMaxComparison(dt,allX,allY,behaviour,t)
-#     best_DAzDu.append(bestDAzDU)
-#     best_DAzDTheta.append(bestDAzDTheta)
-#     best_DEleDU.append(bestDEleDU)
-#     best_DEleDTheta.append(bestDEleDTheta)
-#     ax_best_dAZDU.plot(t,bestDAzDU,label="FoV: "+str(angle) + " Viewing Angle: "+ str(bestDAzDU_angle),color=colors[i])
-#     ax_best_dAZDTheta.plot(t,bestDAzDTheta,label="FoV: "+str(angle) + " Viewing Angle: "+ str(bestDAzDTheta_angle),color=colors[i])
-#     ax_best_dEleDU.plot(t,bestDEleDU,label="FoV: "+str(angle) + " Viewing Angle: "+ str(bestDEleDU_angle),color=colors[i])
-#     ax_best_dEleDTheta.plot(t,bestDEleDTheta,label="FoV: "+str(angle) + " Viewing Angle: "+ str(bestDEleDTheta_angle),color=colors[i])     
-
-# ax_best_dAZDU.legend(bbox_to_anchor=(1.05, 1), loc='upper left')    
-# ax_best_dAZDTheta.legend(bbox_to_anchor=(1.05, 1), loc='upper left')   
-# ax_best_dEleDU.legend(bbox_to_anchor=(1.05, 1), loc='upper left')
-# ax_best_dEleDTheta.legend(bbox_to_anchor=(1.05, 1), loc='upper left')
-# fig_dAzDU.tight_layout()
-# fig_dAzDTheta.tight_layout()
-# fig_dEleDU.tight_layout()
-# fig_dEleDTheta.tight_layout()
-# fig_dAzDU.savefig("Visuals/dAzDU_best.png")
-# fig_dAzDTheta.savefig("Visuals/dAzDTheta_best.png")
-# fig_dEleDTheta.savefig("Visuals/dEleDTheta_best.png")
-# fig_dEleDU.savefig("Visuals/dEleDU_best.png")
-
-# plt.show() 
-# exit()
-# plt.close('all')
+plt.show() 
+exit()
+plt.close('all')
 
 # Sphere plot
 print("Starting sphere stuff now")

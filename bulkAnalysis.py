@@ -3,6 +3,8 @@ import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 import os
+from sklearn.linear_model import LinearRegression
+import statsmodels.api as sm
 
 def readFileU(filename):
     file = open(filename)
@@ -101,17 +103,47 @@ def bulkRun(pNumber,fovRange,thetaRange):
             buffer.append(error)
         rmseListFullTheta.append(buffer)
         rmseListAverageTheta.append(np.average(np.array(buffer)))
-    print(rmseListFullTheta)
-    print(rmseListAverageTheta)
     return rmseListAverage,rmseListFull,rmseListAverageTheta,rmseListFullTheta
 
+
+def bulkAnalysis(meanErrors,fovRange):
+    fovConst = sm.add_constant(fovRange)
+    model = sm.OLS(meanErrors,fovConst)
+    results=model.fit()
+    return results.summary()
+    
 fovRange = [20,30,60,90,120,140]
-thetaRange = [20,140]
+thetaRange = np.array([20,140])
+lowFOV = np.array([20,30,60,90])
+highFOV = np.array([90,120,140])
 writeFolder = "Visuals/Results/"
-pNumbers = ["P1"]
+pNumbers = ["VEOR","AGES"]
+fullAverageU=[]
+fullAverageTheta=[]
+lowFOVAverageU=[]
+highFOVAverageU=[]
 figure = 1
+
+bulkFigU = plt.figure(figure)
+figure+=1
+ax = bulkFigU.add_subplot(111)
+plt.title("Change in RMSE for velocity task for all participants")
+plt.ylabel("RMSE [(m/s) ^ 2]")
+plt.xlabel("Field of View")
+
+bulkFigTheta = plt.figure(figure)
+figure+=1
+axTheta = bulkFigTheta.add_subplot(111)
+plt.title("Change in RMSE for Theta task for all participants")
+plt.ylabel("RMSE [(deg) ^ 2]")
+plt.xlabel("Field of View")
+
 for pNumber in pNumbers:
     AverageU,_,AverageTheta,_ = bulkRun(pNumber,fovRange,thetaRange)
+    fullAverageU.append(AverageU)
+    fullAverageTheta.append(AverageTheta)
+    lowFOVAverageU.append(AverageU[0:4])
+    highFOVAverageU.append(AverageU[3:])
     saveNameU = writeFolder + "RMSE_U_" + pNumber
     saveNameTheta = writeFolder + "RMSE_Theta_" + pNumber
     
@@ -130,4 +162,33 @@ for pNumber in pNumbers:
     plt.xlabel("Field of View")
     plt.plot(thetaRange,AverageTheta,marker="x")
     plt.savefig(saveNameTheta)
+    
+    ax.plot(fovRange,AverageU,marker="x",label= pNumber)
+    axTheta.plot(thetaRange,AverageTheta,marker="x",label=pNumber)
+ax.legend()
+axTheta.legend()
+bulkFigU.savefig(writeFolder+"RMSE_All_U")
+bulkFigTheta.savefig(writeFolder+"RMSE_All_Theta")
 plt.show()
+plt.close('all')
+print(lowFOVAverageU)
+
+resLowFOV = bulkAnalysis(np.array(lowFOVAverageU).mean(axis=0),lowFOV)
+print(resLowFOV)
+
+resHighFoV = bulkAnalysis(np.array(highFOVAverageU).mean(axis=0),highFOV)
+print(resHighFoV)
+
+resTheta = bulkAnalysis(np.array(fullAverageTheta).mean(axis=0),thetaRange)
+print(resTheta)
+
+exit()
+model = LinearRegression()
+model.fit(lowFOV.reshape(-1,1),np.array(lowFOVAverageU).mean(axis=0))
+print(f'Slope: {model.coef_[0]}')
+
+model.fit(highFOV.reshape(-1,1),np.array(highFOVAverageU).mean(axis=0))
+print(f'Slope: {model.coef_[0]}')
+
+model.fit(thetaRange.reshape(-1,1),np.array(fullAverageTheta).mean(axis=0))
+print(f'Slope: {model.coef_[0]}')

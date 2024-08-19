@@ -4,7 +4,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 folder = "Heli_Sim/Assets/Scripts/Data/"
-filename = folder + "Day_1/export_veor210,547447,5255648,519_actual_20.csv"
+filename = folder + "export_ages162,5715529,92789,6931978,7688_actual_20.csv"
 file = open(filename)
 Time=[]
 controlVelocity = []
@@ -29,7 +29,6 @@ error = np.zeros_like(Time) - heliVelocity
 uDf = pd.DataFrame({'Time':Time,'error':error})
 uDf.index = Time
 uDfTrunc = uDf.truncate(before=uDf[Time>=30].iloc[0,0])
-rmse = np.sqrt(np.sum(uDfTrunc["error"]**2) / len(uDfTrunc["error"]))
 print(rmse)
 
 
