@@ -176,7 +176,7 @@ print(gm,pm,wcg,wcp)
 np.random.seed(34)
 T_m = 120
 T_lead_in = 30
-t_m = np.arange(0,T_m,0.1)
+t_m = np.arange(0,T_m,0.01)
 w_m = (2*np.pi) / T_m
 f_range = [0.1,20]
 A_multiplier = 1
@@ -209,9 +209,9 @@ for i in range (0,len(w_d)):
     buffer =  A_d[i] * np.sin(w_d[i] * t_m  + phi_d[i])
     f_d.append( buffer)
     f+= f_d[i]
-f_d_lead_in = -1 * f[0:300]
+f_d_lead_in = -1 * f[0:3000]
 f_d_lead_in = f_d_lead_in[::-1]
-t = np.arange(0,T_m+T_lead_in,0.1)
+t = np.arange(0,T_m+T_lead_in,0.01)
 f_full = np.concatenate((f_d_lead_in,f))
 
 plt.figure(fig_count)
@@ -226,8 +226,8 @@ fig_count+=1
 plt.title("Forcing Function")
 plt.ylabel("Velocity [m/s]")
 plt.xlabel("Time [s]")
-plt.plot(t[0:301],f_full[0:301],label="lead in")
-plt.plot(t[300:],f_full[300:],label="ff")
+plt.plot(t[0:3001],f_full[0:3001],label="lead in")
+plt.plot(t[3000:],f_full[3000:],label="ff")
 plt.legend()
 
 plt.figure(fig_count)
@@ -252,7 +252,7 @@ for i in range (0,len(w_d_training_1)):
     buffer =  A_d_training_1[i] * np.sin(w_d_training_1[i] * t_m  + phi_d[i])
     f_d_training_1.append( buffer)
     f_training_1+= f_d_training_1[i]
-f_d_lead_in_training_1 = -1 * f_training_1[0:300]
+f_d_lead_in_training_1 = -1 * f_training_1[0:3000]
 f_d_lead_in_training_1 = f_d_lead_in_training_1[::-1]
 f_full_training_1 = np.concatenate((f_d_lead_in_training_1,f_training_1))
 
@@ -271,7 +271,7 @@ for i in range (0,len(w_d_training_2)):
     buffer =  A_d_training_2[i] * np.sin(w_d_training_2[i] * t_m  + phi_d[i])
     f_d_training_2.append( buffer)
     f_training_2+= f_d_training_2[i]
-f_d_lead_in_training_2 = -1 * f_training_2[0:300]
+f_d_lead_in_training_2 = -1 * f_training_2[0:3000]
 f_d_lead_in_training_2 = f_d_lead_in_training_2[::-1]
 f_full_training_2 = np.concatenate((f_d_lead_in_training_2,f_training_2))
 
@@ -280,10 +280,10 @@ fig_count+=1
 plt.title("TrainingFunction")
 plt.ylabel("Velocity [m/s]")
 plt.xlabel("Time [s]")
-plt.plot(t[0:301],f_full_training_1[0:301],label="lead in_1")
-plt.plot(t[300:],f_full_training_1[300:],label="ff_1")
-plt.plot(t[0:301],f_full_training_2[0:301],label="lead in_2")
-plt.plot(t[300:],f_full_training_2[300:],label="ff_2")
+plt.plot(t[0:3001],f_full_training_1[0:3001],label="lead in_1")
+plt.plot(t[3000:],f_full_training_1[3000:],label="ff_1")
+plt.plot(t[0:3001],f_full_training_2[0:3001],label="lead in_2")
+plt.plot(t[3000:],f_full_training_2[3000:],label="ff_2")
 plt.legend()
 
 
@@ -295,7 +295,6 @@ training_info = pd.DataFrame({})
 training_info.insert(0,"training_1",f_full_training_1)
 training_info.insert(0,"training_2",f_full_training_2)
 training_info.to_csv("Heli_Sim/Assets/Scripts/training.csv")
-# %%
 
 
 # %%
@@ -474,7 +473,7 @@ print(gm,pm,wcg,wcp)
 np.random.seed(34)
 T_m = 120
 T_lead_in = 30
-t_m = np.arange(0,T_m,0.1)
+t_m = np.arange(0,T_m,0.01)
 w_m = (2*np.pi) / T_m
 f_range = [0.1,20]
 A_multiplier = 1
@@ -507,9 +506,9 @@ for i in range (0,len(w_d)):
     buffer =  A_d[i] * np.sin(w_d[i] * t_m  + phi_d[i])
     f_d.append( buffer)
     f+= f_d[i]
-f_d_lead_in = -1 * f[0:300]
+f_d_lead_in = -1 * f[0:3000]
 f_d_lead_in = f_d_lead_in[::-1]
-t = np.arange(0,T_m+T_lead_in,0.1)
+t = np.arange(0,T_m+T_lead_in,0.01)
 f_full = np.concatenate((f_d_lead_in,f))
 
 plt.figure(fig_count)
@@ -524,8 +523,8 @@ fig_count+=1
 plt.title("Forcing Function with Lead in time")
 plt.ylabel("Velocity [m/s]")
 plt.xlabel("Time [s]")
-plt.plot(t[0:301],f_full[0:301],label="lead in")
-plt.plot(t[300:],f_full[300:],label="ff")
+plt.plot(t[0:3001],f_full[0:3001],label="lead in")
+plt.plot(t[3000:],f_full[3000:],label="ff")
 plt.legend()
 
 plt.figure(fig_count)
@@ -558,7 +557,7 @@ for i in range (0,len(w_d)):
     buffer =  A_theta[i] * np.sin(w_theta[i] * t_m  + phi_d[i])
     f_theta_d.append(buffer)
     f_theta+= f_theta_d[i]
-f_theta_lead_in = -1 * f_theta[0:300]
+f_theta_lead_in = -1 * f_theta[0:3000]
 f_theta_lead_in = f_theta_lead_in[::-1]
 f_theta_full = np.concatenate((f_theta_lead_in,f_theta))
 plt.figure(fig_count)
@@ -567,8 +566,8 @@ plt.title("Forcing Function Theta")
 plt.ylabel("Theta [deg]")
 plt.xlabel("Time [s]")
 # plt.plot(t_m,f_theta)
-plt.plot(t[0:301],f_theta_full[0:301],label="lead in")
-plt.plot(t[300:],f_theta_full[300:],label="ff")
+plt.plot(t[0:3001],f_theta_full[0:3001],label="lead in")
+plt.plot(t[3000:],f_theta_full[3000:],label="ff")
 plt.legend()
 
 info_theta = pd.DataFrame({})
@@ -591,7 +590,7 @@ for i in range (0,len(w_d_training_1)):
     buffer =  A_d_training_1[i] * np.sin(w_d_training_1[i] * t_m  + phi_d[i])
     f_d_training_1.append( buffer)
     f_training_1+= f_d_training_1[i]
-f_d_lead_in_training_1 = -1 * f_training_1[0:300]
+f_d_lead_in_training_1 = -1 * f_training_1[0:3000]
 f_d_lead_in_training_1 = f_d_lead_in_training_1[::-1]
 f_full_training_1 = np.concatenate((f_d_lead_in_training_1,f_training_1))
 
@@ -610,7 +609,7 @@ for i in range (0,len(w_d_training_2)):
     buffer =  A_d_training_2[i] * np.sin(w_d_training_2[i] * t_m  + phi_d[i])
     f_d_training_2.append( buffer)
     f_training_2+= f_d_training_2[i]
-f_d_lead_in_training_2 = -1 * f_training_2[0:300]
+f_d_lead_in_training_2 = -1 * f_training_2[0:3000]
 f_d_lead_in_training_2 = f_d_lead_in_training_2[::-1]
 f_full_training_2 = np.concatenate((f_d_lead_in_training_2,f_training_2))
 
@@ -619,10 +618,10 @@ fig_count+=1
 plt.title("TrainingFunction")
 plt.ylabel("Velocity [m/s]")
 plt.xlabel("Time [s]")
-plt.plot(t[0:301],f_full_training_1[0:301],label="lead in_1")
-plt.plot(t[300:],f_full_training_1[300:],label="ff_1")
-plt.plot(t[0:301],f_full_training_2[0:301],label="lead in_2")
-plt.plot(t[300:],f_full_training_2[300:],label="ff_2")
+plt.plot(t[0:3001],f_full_training_1[0:3001],label="lead in_1")
+plt.plot(t[3000:],f_full_training_1[3000:],label="ff_1")
+plt.plot(t[0:3001],f_full_training_2[0:3001],label="lead in_2")
+plt.plot(t[3000:],f_full_training_2[3000:],label="ff_2")
 plt.legend()
 
 training_info = pd.DataFrame({})
@@ -632,7 +631,7 @@ training_info.to_csv("Heli_Sim/Assets/Scripts/training.csv")
 # %%
 #Check FFT for leakage
 n = len(f)
-fs = 10  # Sampling frequency is the inverse of the time step (0.1 seconds)
+fs = 100  # Sampling frequency is the inverse of the time step (0.01 seconds)
 fft_result = np.fft.fft(f)
 fft_freqs = np.fft.fftfreq(n, 1/fs)
 

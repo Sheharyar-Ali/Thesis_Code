@@ -5,7 +5,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 folder = "Heli_Sim/Assets/Scripts/Data/"
-filename = folder + "export_ages162,5715_theta_20.csv"
+filename = folder + "export_test151,9673_theta_140.csv"
 file = open(filename)
 Time=[]
 controlTheta = []
@@ -37,7 +37,7 @@ file.close()
 filename = "Heli_Sim/Assets/Scripts/forcing_func_theta.csv"
 file = open(filename)
 ff=[]
-t= np.arange(0,150,0.1)
+t= np.arange(0,150,0.01)
 csvreader = csv.reader(file)
 for row in csvreader:
     if(row[1] != "forcing function"):
@@ -59,9 +59,9 @@ ffNormalised = np.array(ffNormalised)
 plt.figure(1)
 plt.title("Theta")
 plt.plot(Time,controlTheta,label="CV")
-plt.plot(Time,-1 *ffTheta,label="FF")
-plt.plot(t,ff,label="actual")
-# plt.plot(Time,actualPitch,label="actual pitch")
+# plt.plot(Time,-1 *ffTheta,label="FF")
+plt.plot(t,ff,label="actual ff")
+plt.plot(Time,actualPitch,label="actual pitch")
 # plt.plot(t,ffNormalised[:-1],label="ff")
 # plt.plot(t,ffChange,label="check")
 plt.legend()
