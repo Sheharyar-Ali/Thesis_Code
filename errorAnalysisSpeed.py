@@ -3,8 +3,8 @@ import csv
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
-folder = "Heli_Sim/Assets/Scripts/Data/"
-filename = folder + "export_test166,174_actual_140.csv"
+folder = "Heli_Sim/Assets/StreamingAssets/Data/"
+filename = folder + "export_ilah187,7435_actual_140.csv"
 file = open(filename)
 Time=[]
 controlVelocity = []

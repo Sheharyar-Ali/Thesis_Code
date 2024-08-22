@@ -61,7 +61,7 @@ def readFileTheta(filename):
     return rmse
 
 def bulkRun(pNumber,fovRange,thetaRange):
-    readFolder = "Heli_Sim/Assets/Scripts/Data/"+pNumber+"/"
+    readFolder = "Heli_Sim/Assets/StreamingAssets/Data/"+pNumber+"/"
     
 
     filesU = []

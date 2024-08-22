@@ -449,9 +449,9 @@ for i in range(1,len(allDAzDu)):
     allMeans_dEleDU.append(np.mean(m))   
     m = allDEleDTheta[i] - allDEleDTheta[0]
     allMeans_dEleDTheta.append(np.mean(m))   
-plt.plot(FoVRange,allMeans_dAzDU,label="dAz_dU",marker = "x")
+plt.plot(FoVRange,allMeans_dAzDU,label="dAz_d(Udt)",marker = "x")
 plt.plot(FoVRange,allMeans_dAzDTheta,label="dAz_dTheta",marker = "x")
-plt.plot(FoVRange,allMeans_dEleDU,label="dEle_dU",marker = "x")
+plt.plot(FoVRange,allMeans_dEleDU,label="dEle_d(Udt)",marker = "x")
 plt.plot(FoVRange,allMeans_dEleDTheta,label="dEle_dTheta",marker = "x")
 plt.legend()
 plt.savefig("Visuals/FOVBehaviour_sine")
@@ -465,9 +465,9 @@ for i,angle in enumerate(FoVRange):
 fig_dAzDU = plt.figure(figure)
 figure+=1
 ax_best_dAZDU = fig_dAzDU.add_subplot(111)
-ax_best_dAZDU.set_title("Best dAzimuth_dU wrt FoV")
+ax_best_dAZDU.set_title("Best dAzimuth_d(Udt) wrt FoV")
 ax_best_dAZDU.set_xlabel("Time [s]")
-ax_best_dAZDU.set_ylabel("dAzimuth_dU [rad s/ m]")
+ax_best_dAZDU.set_ylabel("dAzimuth_d(Udt) [rad s/ m]")
 
 
 fig_dAzDTheta = plt.figure(figure)
@@ -481,7 +481,7 @@ ax_best_dAZDTheta.set_ylabel("dAzimuth_dTheta [-]")
 fig_dEleDU = plt.figure(figure)
 figure+=1
 ax_best_dEleDU = fig_dEleDU.add_subplot(111)
-ax_best_dEleDU.set_title("Best dElevation_dU wrt FoV")
+ax_best_dEleDU.set_title("Best dElevation_d(Udt) wrt FoV")
 ax_best_dEleDU.set_xlabel("Time [s]")
 ax_best_dEleDU.set_ylabel("dElevation_dU [rad s/ m]")
 
@@ -505,10 +505,10 @@ for i,angle in enumerate(FoVRange):
     best_DAzDTheta.append(bestDAzDTheta)
     best_DEleDU.append(bestDEleDU)
     best_DEleDTheta.append(bestDEleDTheta)
-    ax_best_dAZDU.plot(t,bestDAzDU,label="FoV: "+str(angle) + " Viewing Angle: "+ str(bestDAzDU_angle),color=colors[i])
-    ax_best_dAZDTheta.plot(t,bestDAzDTheta,label="FoV: "+str(angle) + " Viewing Angle: "+ str(bestDAzDTheta_angle),color=colors[i])
-    ax_best_dEleDU.plot(t,bestDEleDU,label="FoV: "+str(angle) + " Viewing Angle: "+ str(bestDEleDU_angle),color=colors[i])
-    ax_best_dEleDTheta.plot(t,bestDEleDTheta,label="FoV: "+str(angle) + " Viewing Angle: "+ str(bestDEleDTheta_angle),color=colors[i])     
+    ax_best_dAZDU.plot(t,bestDAzDU,label="FoV: "+str(angle) + ", Viewing Angle: "+ str(bestDAzDU_angle),color=colors[i])
+    ax_best_dAZDTheta.plot(t,bestDAzDTheta,label="FoV: "+str(angle) + ", Viewing Angle: "+ str(bestDAzDTheta_angle),color=colors[i])
+    ax_best_dEleDU.plot(t,bestDEleDU,label="FoV: "+str(angle) + ", Viewing Angle: "+ str(bestDEleDU_angle),color=colors[i])
+    ax_best_dEleDTheta.plot(t,bestDEleDTheta,label="FoV: "+str(angle) + ", Viewing Angle: "+ str(bestDEleDTheta_angle),color=colors[i])     
 
 ax_best_dAZDU.legend(bbox_to_anchor=(1.05, 1), loc='upper left')    
 ax_best_dAZDTheta.legend(bbox_to_anchor=(1.05, 1), loc='upper left')   

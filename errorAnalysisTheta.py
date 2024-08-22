@@ -4,7 +4,7 @@ import csv
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
-folder = "Heli_Sim/Assets/Scripts/Data/"
+folder = "Heli_Sim/Assets/StreamingAssets/Data/"
 filename = folder + "export_test151,9673_theta_140.csv"
 file = open(filename)
 Time=[]
