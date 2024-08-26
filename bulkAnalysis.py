@@ -61,7 +61,7 @@ def readFileTheta(filename):
     return rmse
 
 def bulkRun(pNumber,fovRange,thetaRange):
-    readFolder = "Heli_Sim/Assets/StreamingAssets/Data/"+pNumber+"/"
+    readFolder = "ExpData/"+pNumber+"/"
     
 
     filesU = []
@@ -171,24 +171,23 @@ bulkFigU.savefig(writeFolder+"RMSE_All_U")
 bulkFigTheta.savefig(writeFolder+"RMSE_All_Theta")
 plt.show()
 plt.close('all')
-print(lowFOVAverageU)
+# print(lowFOVAverageU)
 
-resLowFOV = bulkAnalysis(np.array(lowFOVAverageU).mean(axis=0),lowFOV)
-print(resLowFOV)
+# resLowFOV = bulkAnalysis(np.array(lowFOVAverageU).mean(axis=0),lowFOV)
+# print(resLowFOV)
 
-resHighFoV = bulkAnalysis(np.array(highFOVAverageU).mean(axis=0),highFOV)
-print(resHighFoV)
+# resHighFoV = bulkAnalysis(np.array(highFOVAverageU).mean(axis=0),highFOV)
+# print(resHighFoV)
 
-resTheta = bulkAnalysis(np.array(fullAverageTheta).mean(axis=0),thetaRange)
-print(resTheta)
+# resTheta = bulkAnalysis(np.array(fullAverageTheta).mean(axis=0),thetaRange)
+# print(resTheta)
 
-exit()
-model = LinearRegression()
-model.fit(lowFOV.reshape(-1,1),np.array(lowFOVAverageU).mean(axis=0))
-print(f'Slope: {model.coef_[0]}')
+# model = LinearRegression()
+# model.fit(lowFOV.reshape(-1,1),np.array(lowFOVAverageU).mean(axis=0))
+# print(f'Slope: {model.coef_[0]}')
 
-model.fit(highFOV.reshape(-1,1),np.array(highFOVAverageU).mean(axis=0))
-print(f'Slope: {model.coef_[0]}')
+# model.fit(highFOV.reshape(-1,1),np.array(highFOVAverageU).mean(axis=0))
+# print(f'Slope: {model.coef_[0]}')
 
-model.fit(thetaRange.reshape(-1,1),np.array(fullAverageTheta).mean(axis=0))
-print(f'Slope: {model.coef_[0]}')
+# model.fit(thetaRange.reshape(-1,1),np.array(fullAverageTheta).mean(axis=0))
+# print(f'Slope: {model.coef_[0]}')
