@@ -5,7 +5,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 folder = "Heli_Sim/Assets/StreamingAssets/Data/"
-filename = folder + "export_ages175,8503364,8685_theta_140.csv"
+filename = folder + "export_enie177,6704_theta_140.csv"
 file = open(filename)
 Time=[]
 controlTheta = []
@@ -72,4 +72,5 @@ plt.figure(2)
 plt.title("Error")
 plt.plot(Time,error)
 # plt.plot(t,np.abs(ffNormalised[:-1] - ffChange))
+
 # %%

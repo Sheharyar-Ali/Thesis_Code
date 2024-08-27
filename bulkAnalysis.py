@@ -117,7 +117,7 @@ thetaRange = np.array([20,140])
 lowFOV = np.array([20,30,60,90])
 highFOV = np.array([90,120,140])
 writeFolder = "Visuals/Results/"
-pNumbers = ["VEOR","AGES","ILAH"]
+pNumbers = ["VEOR","AGES","ILAH","AVUN","AKLA","ENIE"]
 fullAverageU=[]
 fullAverageTheta=[]
 lowFOVAverageU=[]
@@ -165,6 +165,7 @@ for pNumber in pNumbers:
     
     ax.plot(fovRange,AverageU,marker="x",label= pNumber)
     axTheta.plot(thetaRange,AverageTheta,marker="x",label=pNumber)
+# plt.close('all')
 ax.legend()
 axTheta.legend()
 bulkFigU.savefig(writeFolder+"RMSE_All_U")
