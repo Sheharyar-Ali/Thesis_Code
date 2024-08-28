@@ -5,6 +5,7 @@ import pandas as pd
 import os
 from sklearn.linear_model import LinearRegression
 import statsmodels.api as sm
+from scipy.stats import f_oneway
 
 def readFileU(filename):
     file = open(filename)
@@ -165,30 +166,39 @@ for pNumber in pNumbers:
     
     ax.plot(fovRange,AverageU,marker="x",label= pNumber)
     axTheta.plot(thetaRange,AverageTheta,marker="x",label=pNumber)
-# plt.close('all')
 ax.legend()
 axTheta.legend()
 bulkFigU.savefig(writeFolder+"RMSE_All_U")
 bulkFigTheta.savefig(writeFolder+"RMSE_All_Theta")
-plt.show()
 plt.close('all')
-# print(lowFOVAverageU)
 
-# resLowFOV = bulkAnalysis(np.array(lowFOVAverageU).mean(axis=0),lowFOV)
-# print(resLowFOV)
+byFOVU = [[],[],[],[],[],[]]
+ULabels = ["FoV 20", "FoV 30", "FoV 60", "FoV 90", "FoV 120", "FoV 140"]
+byFOVTheta = [[],[]]
+ThetaLabels = ["FoV 20", "FoV 140"]
+for i,data in enumerate(fullAverageU):
+    for x in range(0,len(data)):
+        byFOVU[x].append(data[x])
+for i,data in enumerate(fullAverageTheta):
+    for x in range(0,len(data)):
+        byFOVTheta[x].append(data[x])
 
-# resHighFoV = bulkAnalysis(np.array(highFOVAverageU).mean(axis=0),highFOV)
-# print(resHighFoV)
+print(f_oneway(byFOVU[0], byFOVU[1],byFOVU[2],byFOVU[3],byFOVU[4],byFOVU[5]))
+print(f_oneway(byFOVTheta[0],byFOVTheta[1]))
 
-# resTheta = bulkAnalysis(np.array(fullAverageTheta).mean(axis=0),thetaRange)
-# print(resTheta)
+plt.figure(figure,figsize=(10,6))
+figure+=1
+plt.boxplot(byFOVU,tick_labels=ULabels)
+plt.title('Velocity Error Distribution Across Different FoVs')
+plt.xlabel('Field of View (FoV)')
+plt.ylabel('Velocity Error')
+plt.savefig(writeFolder+"Boxplot_U")
 
-# model = LinearRegression()
-# model.fit(lowFOV.reshape(-1,1),np.array(lowFOVAverageU).mean(axis=0))
-# print(f'Slope: {model.coef_[0]}')
-
-# model.fit(highFOV.reshape(-1,1),np.array(highFOVAverageU).mean(axis=0))
-# print(f'Slope: {model.coef_[0]}')
-
-# model.fit(thetaRange.reshape(-1,1),np.array(fullAverageTheta).mean(axis=0))
-# print(f'Slope: {model.coef_[0]}')
+plt.figure(figure,figsize=(10,6))
+figure+=1
+plt.boxplot(byFOVTheta,tick_labels=ThetaLabels)
+plt.title('Pitch Angle Error Distribution Across Different FoVs')
+plt.xlabel('Field of View (FoV)')
+plt.ylabel('Pitch Error')
+plt.savefig(writeFolder+"Boxplot_Theta")
+plt.show()
