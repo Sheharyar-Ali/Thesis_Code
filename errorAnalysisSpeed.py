@@ -4,7 +4,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 folder = "Heli_Sim/Assets/StreamingAssets/Data/"
-filename = folder + "export_enie164,0452354,4867_actual_120.csv"
+filename = folder + "export_aaoo163,4881336,9963514,6851_actual_140.csv"
 file = open(filename)
 Time=[]
 controlVelocity = []
@@ -57,6 +57,5 @@ plt.legend()
 plt.figure(2)
 plt.title("Error")
 plt.plot(Time,error)
-
 
 # %%
