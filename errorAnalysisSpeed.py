@@ -4,7 +4,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 folder = "Heli_Sim/Assets/StreamingAssets/Data/"
-filename = folder + "export_aaoo163,4881336,9963514,6851_actual_140.csv"
+filename = folder + "export_isra165,8189357,39_training_140.csv"
 file = open(filename)
 Time=[]
 controlVelocity = []
