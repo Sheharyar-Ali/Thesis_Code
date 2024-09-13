@@ -112,18 +112,107 @@ def bulkAnalysis(meanErrors,fovRange):
     model = sm.OLS(meanErrors,fovConst)
     results=model.fit()
     return results.summary()
+
+def sortOrder(sequence,id):
+    if(id < len(sequence)):
+        first = id -1
+    else:
+        first = id % len(sequence) - 1
+    if(first!=0):
+        slice1 = sequence[first:]
+        slice2 = sequence[0:first]
+        return slice1 + slice2
+    else: 
+        return  sequence
+def sortOrderDebug(sequence,id):
+    if(id <= len(sequence)):
+        first = id -1
+    else:
+        first = id % len(sequence) - 1
+    print(id,first,sequence)
+    if(first!=0):
+        slice1 = sequence[first:]
+        slice2 = sequence[0:first]
+        print(slice1,slice2)
+        return slice1 + slice2
+    else: 
+        return  sequence
+
+def sortRunOrder(expMatrixU,expMatrixTheta,expMatrixFull,participants):
+    fullU =[]
+    fullTheta=[]
+    fullAll=[]
+    fileListAll = []
+    for i,participant in enumerate(participants):
+        listU=[]
+        listTheta=[]
+        listFull=[]
+        fileListU=[]
+        fileListTheta=[]
+        fileListFull=[]
+        readFolder = "ExpData/"+participant+"/"
+        runOrderU = sortOrder(expMatrixU,i+1)
+        runOrderTheta = sortOrder(expMatrixTheta,i+1)
+        runOrderFull = sortOrder(expMatrixFull,i+1)
+        for cond in runOrderFull:
+            fovChosen = cond[1:]
+            if(cond[0] == "U"):
+                name = "actual_" + str(fovChosen)+".csv"
+            else:
+                name = "theta_" + str(fovChosen)+".csv"
+            buffer = []
+            # name = "actual_" + str(cond)+".csv"
+            for fileName in os.listdir(readFolder):
+                if(fileName.endswith(name)):
+                    buffer.append(fileName)
+            if(len(buffer) > 2):
+                buffer = buffer[1:]
+            
+            if(len(buffer[0]) > len(buffer[1])):
+                order = [buffer[1],buffer[0]]   
+            else:
+                order = [buffer[0],buffer[1]]
+            if(cond[0] == "U"):
+                listU.append(readFileU(readFolder+order[0]))
+                listU.append(readFileU(readFolder+order[1]))      
+                fileListU.append(order[0])
+                fileListU.append(order[1])
+            else:
+                listTheta.append(readFileTheta(readFolder+order[0]))
+                listTheta.append(readFileTheta(readFolder+order[1]))      
+                fileListTheta.append(order[0])
+                fileListTheta.append(order[1])
+            listFull.append(readFileU(readFolder+order[0]))
+            listFull.append(readFileU(readFolder+order[1]))      
+            fileListFull.append(order[0])
+            fileListFull.append(order[1])
+        fullU.append(listU)
+        fullTheta.append(listTheta)
+        fullAll.append(listFull)
+        fileListAll.append(fileListFull)
+    return fullU,runOrderU,fullTheta,runOrderTheta,fullAll,fileListAll
     
 fovRange = [20,30,60,90,120,140]
 thetaRange = np.array([20,140])
+fullList = ["U20","U30","U60","U90","U120","U140","T20","T140"]
 lowFOV = np.array([20,30,60,90])
 highFOV = np.array([90,120,140])
 writeFolder = "Visuals/Results/"
-pNumbers = ["VEOR","AGES","ILAH","AVUN","AKLA","ENIE","AAOO","HRTE","ARAM","UGIN","LADV","LEAM"]
+pNumbers = ["VEOR","AGES","ILAH","AVUN","AKLA","ENIE","AAOO","HRTE","ARAM","UGIN","HEIA","LADV","LEAM"]
+numberParticipants = 14
+partList = np.arange(1,numberParticipants+1)
 fullAverageU=[]
 fullAverageTheta=[]
 lowFOVAverageU=[]
 highFOVAverageU=[]
 figure = 1
+
+
+_,_,_,_,fullAll,runOrderFull= sortRunOrder(fovRange,thetaRange,fullList,pNumbers)
+print(np.array(runOrderFull))
+print(np.array(fullAll))
+exit()
+
 
 bulkFigU = plt.figure(figure)
 figure+=1
