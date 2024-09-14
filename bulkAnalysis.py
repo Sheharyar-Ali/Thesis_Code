@@ -177,13 +177,16 @@ def sortRunOrder(expMatrixU,expMatrixTheta,expMatrixFull,participants):
                 listU.append(readFileU(readFolder+order[1]))      
                 fileListU.append(order[0])
                 fileListU.append(order[1])
+                listFull.append(readFileU(readFolder+order[0]))
+                listFull.append(readFileU(readFolder+order[1]))      
+                
             else:
                 listTheta.append(readFileTheta(readFolder+order[0]))
                 listTheta.append(readFileTheta(readFolder+order[1]))      
                 fileListTheta.append(order[0])
                 fileListTheta.append(order[1])
-            listFull.append(readFileU(readFolder+order[0]))
-            listFull.append(readFileU(readFolder+order[1]))      
+                listFull.append(readFileTheta(readFolder+order[0]))
+                listFull.append(readFileTheta(readFolder+order[1]))                  
             fileListFull.append(order[0])
             fileListFull.append(order[1])
         fullU.append(listU)
@@ -198,8 +201,9 @@ fullList = ["U20","U30","U60","U90","U120","U140","T20","T140"]
 lowFOV = np.array([20,30,60,90])
 highFOV = np.array([90,120,140])
 writeFolder = "Visuals/Results/"
-pNumbers = ["VEOR","AGES","ILAH","AVUN","AKLA","ENIE","AAOO","HRTE","ARAM","UGIN","HEIA","LADV","LEAM"]
+pNumbers = ["VEOR","AGES","ILAH","AVUN","AKLA","ENIE","AAOO","HRTE","ARAM","UGIN","LADV","LEAM"]
 numberParticipants = 14
+runOrder = np.arange(1,17)
 partList = np.arange(1,numberParticipants+1)
 fullAverageU=[]
 fullAverageTheta=[]
@@ -211,6 +215,18 @@ figure = 1
 _,_,_,_,fullAll,runOrderFull= sortRunOrder(fovRange,thetaRange,fullList,pNumbers)
 print(np.array(runOrderFull))
 print(np.array(fullAll))
+
+runOrderFig = plt.figure(figure)
+figure+=1
+axRunOrder = runOrderFig.add_subplot(111)
+plt.title("RMSE perfromance vs run order")
+plt.ylabel("RMSE")
+plt.xlabel("Run number")
+for i,participant in enumerate(fullAll):
+    axRunOrder.plot(runOrder,np.array(participant),label=i+1,marker="x")
+plt.legend()
+plt.show()
+
 exit()
 
 
