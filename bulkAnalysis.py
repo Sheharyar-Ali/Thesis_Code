@@ -202,7 +202,7 @@ lowFOV = np.array([20,30,60,90])
 highFOV = np.array([90,120,140])
 writeFolder = "Visuals/Results/"
 pNumbers = ["VEOR","AGES","ILAH","AVUN","AKLA","ENIE","AAOO","HRTE","ARAM","UGIN","LADV","LEAM"]
-numberParticipants = 14
+numberParticipants = 12
 runOrder = np.arange(1,17)
 partList = np.arange(1,numberParticipants+1)
 fullAverageU=[]
@@ -210,7 +210,7 @@ fullAverageTheta=[]
 lowFOVAverageU=[]
 highFOVAverageU=[]
 figure = 1
-
+runOrderList=[[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[]]
 
 _,_,_,_,fullAll,runOrderFull= sortRunOrder(fovRange,thetaRange,fullList,pNumbers)
 print(np.array(runOrderFull))
@@ -224,9 +224,36 @@ plt.ylabel("RMSE")
 plt.xlabel("Run number")
 for i,participant in enumerate(fullAll):
     axRunOrder.plot(runOrder,np.array(participant),label=i+1,marker="x")
+    for j,val in enumerate(participant):
+        runOrderList[j].append(float(val))
 plt.legend()
-plt.show()
 
+plt.savefig(writeFolder+"RunOrderFull")
+ANOVArunOrder = f_oneway(runOrderList[0],
+                         runOrderList[1],
+                         runOrderList[2],
+                         runOrderList[3],
+                         runOrderList[4],
+                         runOrderList[5],
+                         runOrderList[6],
+                         runOrderList[7],
+                         runOrderList[8],
+                         runOrderList[9],
+                         runOrderList[10],
+                         runOrderList[11],
+                         runOrderList[12],
+                         runOrderList[13],
+                         runOrderList[14],
+                         runOrderList[15])
+print(ANOVArunOrder)
+plt.figure(figure,figsize=(10,6))
+figure+=1
+plt.boxplot(runOrderList,tick_labels=runOrder)
+plt.title('Error distribution across runs')
+plt.xlabel('Run')
+plt.ylabel('Error')
+plt.savefig(writeFolder+"BoxPlot_RunOrder")
+plt.show()
 exit()
 
 
