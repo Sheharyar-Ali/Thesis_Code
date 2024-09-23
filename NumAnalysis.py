@@ -328,7 +328,7 @@ ax_dEleDTheta.set_ylabel("dElevation_dTheta [-]")
 
 
 xVals = np.arange(xRange[0],xRange[1]+1,1)
-yVals = xVals * np.tan(140/2)
+yVals = xVals * np.tan(np.radians(140/2))
 for i,xPos in enumerate(xVals):
     dAzdU, dAzdTheta, dEledU,dEledTheta = Analytical(deltaT=dt,z=-5,xVal=xPos,yVal=yVals[i],thetaVals=behaviour["Theta"],uVals=behaviour["U"])
     yVals[i] = round(yVals[i],2)
