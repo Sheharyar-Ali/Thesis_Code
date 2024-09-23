@@ -202,7 +202,7 @@ lowFOV = np.array([20,30,60,90])
 highFOV = np.array([90,120,140])
 writeFolder = "Visuals/Results/"
 pNumbers = ["VEOR","AGES","ILAH","AVUN","AKLA","ENIE","AAOO","HRTE","ARAM","UGIN","LADV","LEAM"]
-numberParticipants = 12
+numberParticipants = len(pNumbers)
 runOrder = np.arange(1,17)
 partList = np.arange(1,numberParticipants+1)
 fullAverageU=[]
@@ -219,14 +219,14 @@ print(np.array(fullAll))
 runOrderFig = plt.figure(figure)
 figure+=1
 axRunOrder = runOrderFig.add_subplot(111)
-plt.title("RMSE perfromance vs run order")
+plt.title("RMSE performance vs run order")
 plt.ylabel("RMSE")
 plt.xlabel("Run number")
 for i,participant in enumerate(fullAll):
     axRunOrder.plot(runOrder,np.array(participant),label=i+1,marker="x")
     for j,val in enumerate(participant):
         runOrderList[j].append(float(val))
-plt.legend()
+# plt.legend()
 
 plt.savefig(writeFolder+"RunOrderFull")
 ANOVArunOrder = f_oneway(runOrderList[0],
@@ -245,7 +245,6 @@ ANOVArunOrder = f_oneway(runOrderList[0],
                          runOrderList[13],
                          runOrderList[14],
                          runOrderList[15])
-print(ANOVArunOrder)
 plt.figure(figure,figsize=(10,6))
 figure+=1
 plt.boxplot(runOrderList,tick_labels=runOrder)
@@ -253,8 +252,7 @@ plt.title('Error distribution across runs')
 plt.xlabel('Run')
 plt.ylabel('Error')
 plt.savefig(writeFolder+"BoxPlot_RunOrder")
-plt.show()
-exit()
+#plt.show()
 
 
 bulkFigU = plt.figure(figure)
@@ -300,8 +298,8 @@ for pNumber in pNumbers:
     axTheta.plot(thetaRange,AverageTheta,marker="x",label=pNumber)
     plt.close(uFig)
     plt.close(ThetaFig)
-ax.legend()
-axTheta.legend()
+# ax.legend()
+# axTheta.legend()
 bulkFigU.savefig(writeFolder+"RMSE_All_U")
 bulkFigTheta.savefig(writeFolder+"RMSE_All_Theta")
 plt.close('all')
@@ -316,9 +314,15 @@ for i,data in enumerate(fullAverageU):
 for i,data in enumerate(fullAverageTheta):
     for x in range(0,len(data)):
         byFOVTheta[x].append(data[x])
+print(np.array(fullAverageTheta))
+print(np.array(byFOVTheta))
+ANOVAUAll = f_oneway(byFOVU[0], byFOVU[1],byFOVU[2],byFOVU[3],byFOVU[4],byFOVU[5])
+ANOVATheta = f_oneway(byFOVTheta[0],byFOVTheta[1])
+ANOVAULast = f_oneway(byFOVU[3],byFOVU[4],byFOVU[5])
 
-print(f_oneway(byFOVU[0], byFOVU[1],byFOVU[2],byFOVU[3],byFOVU[4],byFOVU[5]))
-print(f_oneway(byFOVTheta[0],byFOVTheta[1]))
+print("ANOVA U all: ", ANOVAUAll)
+print("ANOVA Theta all: ", ANOVATheta)
+print("ANOVA U last: ", ANOVAULast)
 
 plt.figure(figure,figsize=(10,6))
 figure+=1
