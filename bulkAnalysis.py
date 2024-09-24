@@ -320,6 +320,7 @@ ANOVAUAll = f_oneway(byFOVU[0], byFOVU[1],byFOVU[2],byFOVU[3],byFOVU[4],byFOVU[5
 ANOVATheta = f_oneway(byFOVTheta[0],byFOVTheta[1])
 ANOVAULast = f_oneway(byFOVU[3],byFOVU[4],byFOVU[5])
 
+print("ANOVA Run Order: ", ANOVArunOrder)
 print("ANOVA U all: ", ANOVAUAll)
 print("ANOVA Theta all: ", ANOVATheta)
 print("ANOVA U last: ", ANOVAULast)

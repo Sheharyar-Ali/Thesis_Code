@@ -227,7 +227,7 @@ print(stdDEleDu,stdDEleDTheta)
 
 plt.figure(figure)
 figure+=1
-plt.title("Variation of dAzimuth with respect to (Udt)\n and Theta over Time for points at 90 degrees")
+plt.title("Variation of dAzimuth with respect to (Udt)\n and Theta over Time for points at +45 degrees")
 plt.xlabel("Time [s]")
 plt.ylabel("dAzimuth_d [rad/m or -]")
 plt.plot(tFixed,meanDAzDU,label="dAzimuth_d(Udt)")
@@ -237,7 +237,7 @@ plt.savefig("Visuals/dAzimuth_90")
 
 plt.figure(figure)
 figure+=1
-plt.title("Average Variation of dElevation with respect to (Udt)\n and Theta over Time for points at 90 degrees")
+plt.title("Average Variation of dElevation with respect to (Udt)\n and Theta over Time for points at +45degrees")
 plt.xlabel("Time [s]")
 plt.ylabel("dElevation_d [rad/m or -]")
 plt.plot(tFixed,meanDEleDU,label="dElevation_d(Udt)")
@@ -277,7 +277,7 @@ print(stdDEleDu,stdDEleDTheta)
 
 plt.figure(figure)
 figure+=1
-plt.title("Variation of dAzimuth with respect to (Udt) \n and Theta over Time for points at 15 degrees")
+plt.title("Variation of dAzimuth with respect to (Udt) \n and Theta over Time for points at +7.5 degrees")
 plt.xlabel("Time [s]")
 plt.ylabel("dAzimuth_d [rad/m or -]")
 plt.plot(tFixed,meanDAzDU,label="dAzimuth_d(Udt)")
@@ -287,7 +287,7 @@ plt.savefig("Visuals/dAzimuth_15")
 
 plt.figure(figure)
 figure+=1
-plt.title("Average Variation of dElevation with respect to (Udt) \n and Theta over Time for points at 15 degrees")
+plt.title("Average Variation of dElevation with respect to (Udt) \n and Theta over Time for points at +7.5 degrees")
 plt.xlabel("Time [s]")
 plt.ylabel("dElevation_d [rad/m or -]")
 plt.plot(tFixed,meanDEleDU,label="dElevation_d(Udt)")
