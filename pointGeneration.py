@@ -85,6 +85,7 @@ folder = "Heli_Sim/Assets/Resources/"
 
 coordsOrg = pd.DataFrame({"X":oldY, "Y": np.ones_like(oldY)*0.2 , "Z": oldX})
 coordsOrg.to_csv(folder+"coordsOrg.csv")
+behaviour.to_csv(folder+"exampleMove.csv")
 for T in timestamps:
     toAdd = behaviour[(behaviour["Time"]>= T - tolerance ) & (behaviour["Time"] < T+tolerance) ]
     print(toAdd.iloc[0])

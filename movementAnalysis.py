@@ -118,6 +118,11 @@ tFixed=np.array(tFixed)
 velFixed=np.array(velFixed)
 pitchFixed = np.array(pitchFixed)    
 pitchRad = pitchFixed * (np.pi/180)
+
+df = pd.DataFrame({"Time": tFixed, "V": velFixed , "Pitch_Deg": pitchFixed, "Pitch_Rad": pitchRad})
+df.to_csv("Heli_Sim/Assets/Resources/actualMove.csv")
+
+
 plt.figure(figure)
 figure+=1
 plt.title("Progression of Velocity")
@@ -198,6 +203,38 @@ plt.savefig("Visuals/dElevation_Exp")
 # Over points at 90 deg
 print("90 Deg now")
 plt.close('all')
+fig_dAzDU = plt.figure(figure)
+figure+=1
+ax_dAZDU = fig_dAzDU.add_subplot(111)
+ax_dAZDU.set_title("Variation of dAzimuth_d(Udt) wrt the two views")
+ax_dAZDU.set_xlabel("Time [s]")
+ax_dAZDU.set_ylabel("dAzimuth_d(Udt) [rad / m]")
+
+
+fig_dAzDTheta = plt.figure(figure)
+figure+=1
+ax_dAZDTheta = fig_dAzDTheta.add_subplot(111)
+ax_dAZDTheta.set_title("Variation of dAzimuth_dTheta wrt the two views")
+ax_dAZDTheta.set_xlabel("Time [s]")
+ax_dAZDTheta.set_ylabel("dAzimuth_dTheta [-]")
+
+
+fig_dEleDU = plt.figure(figure)
+figure+=1
+ax_dEleDU = fig_dEleDU.add_subplot(111)
+ax_dEleDU.set_title("Variation of dElevation_d(Udt) wrt the two views")
+ax_dEleDU.set_xlabel("Time [s]")
+ax_dEleDU.set_ylabel("dElevation_d(Udt) [rad / m]")
+
+
+fig_dEleDTheta = plt.figure(figure)
+figure+=1
+ax_dEleDTheta = fig_dEleDTheta.add_subplot(111)
+ax_dEleDTheta.set_title("Variation of dElevation_dTheta wrt the two views")
+ax_dEleDTheta.set_xlabel("Time [s]")
+ax_dEleDTheta.set_ylabel("dElevation_dTheta [-]")
+
+
 xVals = np.arange(xRange[0],xRange[1]+1,1)
 yVals = xVals * np.tan(np.radians(90/2))
 alldAzDu,alldAzdTheta, alldEledU,alldEledTheta = [],[],[],[]
@@ -221,10 +258,16 @@ Az_t_theta = cumtrapz(meanDAzDTheta,pitchFixed,initial=0)
 Az_t_U = cumtrapz(meanDAzDU,(velFixed * (tFixed[1] - tFixed[0])),initial=0)
 
 #print(alldAzDu)
+print("RMSE")
 print(stdDAzDu,stdDAzDTheta)
 print(stdDEleDu,stdDEleDTheta)
-
-
+print("Means")
+print(np.mean(meanDAzDU), np.mean(meanDAzDTheta))
+print(np.mean(meanDEleDU),np.mean(meanDEleDTheta))
+ax_dAZDU.plot(tFixed,meanDAzDU,label="45 deg")
+ax_dAZDTheta.plot(tFixed,meanDAzDTheta,label="45 deg")
+ax_dEleDU.plot(tFixed,meanDEleDU,label="45 deg")
+ax_dEleDTheta.plot(tFixed,meanDEleDTheta,label="45 deg")
 plt.figure(figure)
 figure+=1
 plt.title("Variation of dAzimuth with respect to (Udt)\n and Theta over Time for points at +45 degrees")
@@ -271,9 +314,25 @@ Az_t_theta = cumtrapz(meanDAzDTheta,pitchFixed,initial=0)
 Az_t_U = cumtrapz(meanDAzDU,(velFixed * (tFixed[1] - tFixed[0])),initial=0)
 
 #print(alldAzDu)
+print("RMSE")
 print(stdDAzDu,stdDAzDTheta)
 print(stdDEleDu,stdDEleDTheta)
+print("Means")
+print(np.mean(meanDAzDU), np.mean(meanDAzDTheta))
+print(np.mean(meanDEleDU),np.mean(meanDEleDTheta))
+ax_dAZDU.plot(tFixed,meanDAzDU,label="7.5 deg")
+ax_dAZDTheta.plot(tFixed,meanDAzDTheta,label="7.5 deg")
+ax_dEleDU.plot(tFixed,meanDEleDU,label="7.5 deg")
+ax_dEleDTheta.plot(tFixed,meanDEleDTheta,label="7.5 deg")
 
+ax_dAZDU.legend()    
+ax_dAZDTheta.legend()   
+ax_dEleDU.legend()
+ax_dEleDTheta.legend()
+fig_dAzDU.savefig("Visuals/dAzDUdt_comparison.png")
+fig_dAzDTheta.savefig("Visuals/dAzDTheta_comparison.png")
+fig_dEleDTheta.savefig("Visuals/dEleDTheta_comparison.png")
+fig_dEleDU.savefig("Visuals/dEleDUdt_comparison.png")    
 
 plt.figure(figure)
 figure+=1
