@@ -2,7 +2,7 @@ import numpy as np
 import itertools
 import pandas as pd
 from scipy.signal import TransferFunction, lsim
-from scipy.integrate import cumtrapz
+from scipy.integrate import cumulative_trapezoid
 
 def generateCoords(fovHor,fovVer,start,end,step):
     """Generate coordiantes within a specific horizontal Fov
@@ -19,7 +19,7 @@ def generateCoords(fovHor,fovVer,start,end,step):
     """
     xCoords = np.arange(start,end,step)
     yCoordsMax = np.tan(np.radians(fovHor/2)) * end
-    yCoords = np.arange(-yCoordsMax,yCoordsMax,step-2)
+    yCoords = np.arange(0,yCoordsMax,step-2)
     zCoords = np.array([0.2])
     Coords = [xCoords,yCoords,zCoords]
     allCoords = list(itertools.product(*Coords))
@@ -53,7 +53,7 @@ def RealisticMovement(input, MTheta1s,MQ,XTheta1s,g,XU,t):
     
     _,theta,_ = lsim(tf_theta1s_theta,U=input,T=t)
     _,u,_ = lsim(tf_theta_u,U=theta,T=t)
-    xPos = cumtrapz(u,t,initial=0)
+    xPos = cumulative_trapezoid(u,t,initial=0)
     output = pd.DataFrame({})
     output.insert(0,"Time", t)
     output.insert(1,"Input",input)
@@ -82,16 +82,17 @@ timestamps = [0.5,1,1.5,2,2.5,3,3.5,4]
 tolerance = 0.005
 folder = "Heli_Sim/Assets/Resources/"
 
-
+print(coords)
 coordsOrg = pd.DataFrame({"X":oldY, "Y": np.ones_like(oldY)*0.2 , "Z": oldX})
 coordsOrg.to_csv(folder+"coordsOrg.csv")
 behaviour.to_csv(folder+"exampleMove.csv")
 for T in timestamps:
     toAdd = behaviour[(behaviour["Time"]>= T - tolerance ) & (behaviour["Time"] < T+tolerance) ]
-    print(toAdd.iloc[0])
     dfCut.append(toAdd.iloc[0])
-for i,slice in enumerate(dfCut):
-    dx = np.array([slice["U"] * 0.5,0,0])
+for i in range(1,len(behaviour)):
+    slice = behaviour.iloc[i]
+    # print(slice)
+    dx = np.array([slice["U"] * (slice["Time"] - behaviour.iloc[i-1]["Time"] ),0,0])
     newCoords =[]
     xChange=[]
     yChange=[]
@@ -107,10 +108,11 @@ for i,slice in enumerate(dfCut):
     yChange=np.array(yChange)
     zChange=np.array(zChange)
     # print(xChange)
-    print(newCoords)
-    name = "coordsNew"+ str(timestamps[i])+ ".csv"
+    # print(newCoords)
+    # exit()
+    # name = "coordsNew"+ str(timestamps[i])+ ".csv"
     
-    coordsNew = pd.DataFrame({"X": yChange, "Y":zChange, "Z": xChange})
-    coordsNew.to_csv(folder+name )
+    # coordsNew = pd.DataFrame({"X": yChange, "Y":-zChange, "Z": xChange})
+    # coordsNew.to_csv(folder+name )
 # print(coordsOrg)
 # print(coordsNew)
