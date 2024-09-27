@@ -19,7 +19,7 @@ def generateCoords(fovHor,fovVer,start,end,step):
     """
     xCoords = np.arange(start,end,step)
     yCoordsMax = np.tan(np.radians(fovHor/2)) * end
-    yCoords = np.arange(0,yCoordsMax,step-2)
+    yCoords = np.arange(-yCoordsMax,yCoordsMax,step-2)
     zCoords = np.array([0.2])
     Coords = [xCoords,yCoords,zCoords]
     allCoords = list(itertools.product(*Coords))
@@ -75,7 +75,7 @@ XQ = 0.6674
 behaviour = RealisticMovement(input,MTheta1s,MQ,XTheta1s,g,XU,t)
 behaviour.insert(3,"Theta_deg",np.degrees(behaviour["Theta"]))
 xRange = [4,40]
-step = 8
+step = 7
 coords,oldX,oldY = generateCoords(140,100,xRange[0],xRange[1],step)
 dfCut =[]
 timestamps = [0.5,1,1.5,2,2.5,3,3.5,4]
