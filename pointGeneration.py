@@ -3,6 +3,7 @@ import itertools
 import pandas as pd
 from scipy.signal import TransferFunction, lsim
 from scipy.integrate import cumulative_trapezoid
+import matplotlib.pyplot as plt
 
 def generateCoords(fovHor,fovVer,start,end,step):
     """Generate coordiantes within a specific horizontal Fov
@@ -19,7 +20,7 @@ def generateCoords(fovHor,fovVer,start,end,step):
     """
     xCoords = np.arange(start,end,step)
     yCoordsMax = np.tan(np.radians(fovHor/2)) * end
-    yCoords = np.arange(-yCoordsMax,yCoordsMax,step-2)
+    yCoords = np.arange(-yCoordsMax,yCoordsMax,step)
     zCoords = np.array([0.2])
     Coords = [xCoords,yCoords,zCoords]
     allCoords = list(itertools.product(*Coords))
@@ -63,7 +64,9 @@ def RealisticMovement(input, MTheta1s,MQ,XTheta1s,g,XU,t):
 
     return output
 
-t = np.linspace(0,4,600)
+# t = np.linspace(0,4,600)
+# Create input
+t = np.arange(0,4.5,0.1)
 input = -1/100 * np.sin((1/2 * 3)*np.pi*t)
 MTheta1s = 26.4
 MQ = -1.8954
@@ -74,45 +77,18 @@ g = 9.80665
 XQ = 0.6674
 behaviour = RealisticMovement(input,MTheta1s,MQ,XTheta1s,g,XU,t)
 behaviour.insert(3,"Theta_deg",np.degrees(behaviour["Theta"]))
-xRange = [4,40]
-step = 7
-coords,oldX,oldY = generateCoords(140,100,xRange[0],xRange[1],step)
-dfCut =[]
-timestamps = [0.5,1,1.5,2,2.5,3,3.5,4]
-tolerance = 0.005
-folder = "Heli_Sim/Assets/Resources/"
+thetaDot = np.diff(a=behaviour['Theta_deg'],prepend=0)
+behaviour.insert(6,"Theta_dot_deg", thetaDot)
+xRange = [2,30]
+step = 3
 
+# Generate list of pointsa to show in Unity
+coords,oldX,oldY = generateCoords(140,100,xRange[0],xRange[1],step)
 print(coords)
+
+# Export data for Unity
+folder = "Heli_Sim/Assets/Resources/"
 coordsOrg = pd.DataFrame({"X":oldY, "Y": np.ones_like(oldY)*0.2 , "Z": oldX})
 coordsOrg.to_csv(folder+"coordsOrg.csv")
 behaviour.to_csv(folder+"exampleMove.csv")
-for T in timestamps:
-    toAdd = behaviour[(behaviour["Time"]>= T - tolerance ) & (behaviour["Time"] < T+tolerance) ]
-    dfCut.append(toAdd.iloc[0])
-for i in range(1,len(behaviour)):
-    slice = behaviour.iloc[i]
-    # print(slice)
-    dx = np.array([slice["U"] * (slice["Time"] - behaviour.iloc[i-1]["Time"] ),0,0])
-    newCoords =[]
-    xChange=[]
-    yChange=[]
-    zChange=[]
-    for point in coords:
-        newPoint,newX,newY,newZ = movement(point,dx,slice["Theta"])
-        newCoords.append(newPoint)
-        xChange.append(newX)
-        yChange.append(newY)
-        zChange.append(newZ)
-    newCoords = np.array(newCoords)
-    xChange = np.array(xChange)
-    yChange=np.array(yChange)
-    zChange=np.array(zChange)
-    # print(xChange)
-    # print(newCoords)
-    # exit()
-    # name = "coordsNew"+ str(timestamps[i])+ ".csv"
-    
-    # coordsNew = pd.DataFrame({"X": yChange, "Y":-zChange, "Z": xChange})
-    # coordsNew.to_csv(folder+name )
-# print(coordsOrg)
-# print(coordsNew)
+

@@ -194,15 +194,20 @@ def sortRunOrder(expMatrixU,expMatrixTheta,expMatrixFull,participants):
         fullAll.append(listFull)
         fileListAll.append(fileListFull)
     return fullU,runOrderU,fullTheta,runOrderTheta,fullAll,fileListAll
-    
+
+# Setup    
 fovRange = [20,30,60,90,120,140]
 thetaRange = np.array([20,140])
 fullList = ["U20","U30","U60","U90","U120","U140","T20","T140"]
 lowFOV = np.array([20,30,60,90])
 highFOV = np.array([90,120,140])
 writeFolder = "Visuals/Results/"
-pNumbers = ["VEOR","AGES","ILAH","AVUN","AKLA","ENIE","AAOO","HRTE","ARAM","UGIN","LADV","LEAM"]
-numberParticipants = len(pNumbers)
+
+# Choose list of participants
+pIDs = ["VEOR","AGES","ILAH","AVUN","AKLA","ENIE","AAOO","HRTE","ARAM","UGIN" , "IODE" ,"LADV","LEAM"]
+numberParticipants = len(pIDs)
+
+# Setup for run order analysis
 runOrder = np.arange(1,17)
 partList = np.arange(1,numberParticipants+1)
 fullAverageU=[]
@@ -212,7 +217,8 @@ highFOVAverageU=[]
 figure = 1
 runOrderList=[[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[]]
 
-_,_,_,_,fullAll,runOrderFull= sortRunOrder(fovRange,thetaRange,fullList,pNumbers)
+# Analyse effects of run order
+_,_,_,_,fullAll,runOrderFull= sortRunOrder(fovRange,thetaRange,fullList,pIDs)
 print(np.array(runOrderFull))
 print(np.array(fullAll))
 
@@ -255,6 +261,7 @@ plt.savefig(writeFolder+"BoxPlot_RunOrder")
 #plt.show()
 
 
+# Setup figures for RMSE of all participants
 bulkFigU = plt.figure(figure)
 figure+=1
 ax = bulkFigU.add_subplot(111)
@@ -269,7 +276,8 @@ plt.title("Change in RMSE for Theta task for all participants")
 plt.ylabel("RMSE [(deg) ^ 2]")
 plt.xlabel("Field of View")
 
-for pNumber in pNumbers:
+# Get data for all participants
+for pNumber in pIDs:
     AverageU,_,AverageTheta,_ = bulkRun(pNumber,fovRange,thetaRange)
     fullAverageU.append(AverageU)
     fullAverageTheta.append(AverageTheta)
@@ -316,6 +324,8 @@ for i,data in enumerate(fullAverageTheta):
         byFOVTheta[x].append(data[x])
 print(np.array(fullAverageTheta))
 print(np.array(byFOVTheta))
+
+# ANOVA results
 ANOVAUAll = f_oneway(byFOVU[0], byFOVU[1],byFOVU[2],byFOVU[3],byFOVU[4],byFOVU[5])
 ANOVATheta = f_oneway(byFOVTheta[0],byFOVTheta[1])
 ANOVAULast = f_oneway(byFOVU[3],byFOVU[4],byFOVU[5])

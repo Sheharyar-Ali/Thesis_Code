@@ -2,6 +2,7 @@
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
+import matplotlib.ticker as ticker
 import control as ctrl
 from scipy.signal import TransferFunction, lsim
 import matplotlib.animation as ani
@@ -53,29 +54,6 @@ def Spherical(x,y,z):
     elevation = np.arccos(z/mod)
     return np.array([np.degrees(azimuth),np.degrees(elevation)])
 
-# def Analytical(dt,z,xVal,yVal,thetaVals,uVals):
-#     x = sy.Symbol("x")
-#     y = sy.Symbol("y")
-#     u = sy.Symbol("u")
-#     theta = sy.Symbol("theta")
-#     Ry = np.array([[sy.cos(theta), 0, sy.sin(theta)],
-#                    [0, 1, 0],
-#                    [-sy.sin(theta), 0, sy.cos(theta)]])
-#     PNew = Ry @ np.array([x,y,z]) - [u*dt ,0,0]
-#     Azimuth = sy.atan(PNew[1] / PNew[0])
-#     modulus = sy.sqrt(PNew[0] **2 + PNew[1] **2 + PNew[2] **2)
-#     Elevation = sy.acos(PNew[2] / modulus)
-#     dAz_dU = sy.lambdify((x,y,theta,u),Azimuth.diff(u))
-#     dEle_dU = sy.lambdify((x,y,theta,u),Elevation.diff(u))
-#     dAz_dTheta = sy.lambdify((x,y,theta,u),Azimuth.diff(theta))
-#     dEle_dTheta = sy.lambdify((x,y,theta,u),Elevation.diff(theta))
-
-
-#     Eval_dAzdU = dAz_dU(xVal,yVal,thetaVals,uVals)
-#     Eval_dAzdTheta = dAz_dTheta(xVal,yVal,thetaVals,uVals)
-#     Eval_dEledU = dEle_dU(xVal,yVal,thetaVals,uVals)
-#     Eval_dEledTheta = dEle_dTheta(xVal,yVal,thetaVals,uVals)
-#     return Eval_dAzdU, Eval_dAzdTheta, Eval_dEledU,Eval_dEledTheta
 
 def Analytical(deltaT,z,xVal,yVal,thetaVals,uVals):
     x = sy.Symbol("x")
@@ -187,42 +165,7 @@ def RealisticMovement(input, MTheta1s,MQ,XTheta1s,g,XU,t):
 
     return output
 
-def updateValues(frame,df):
-    azimuths,elevations,\
-    new_azimuths,new_elevations,\
-    oldPositions,newPositions, newPositionsTrans,newPositionsRot = [],[],[],[],[],[],[],[]
-    u = np.array(df['U'].iloc[frame])
-    theta= np.array(df['Theta'].iloc[frame])
-    time = np.array(df['Time'].iloc[frame])
-    dt = df["Time"].iloc[1] - df["Time"].iloc[0]
-    for point in points_world:
-        old,new,oldPos,newPosRot,newPosTrans,newPos = ProjRetina(observerOrigin,point,r,u,dt,theta)
-        azimuths.append(old[0])
-        elevations.append(old[1])
-        new_azimuths.append(new[0])
-        new_elevations.append(new[1])
-        oldPositions.append(oldPos)
-        newPositions.append(newPos)
-        newPositionsTrans.append(newPosTrans)
-        newPositionsRot.append(newPosRot)
-        
-    azimuths = np.array(azimuths)
-    new_azimuths = np.array(new_azimuths)
-    elevations = np.array(elevations)
-    new_elevations = np.array(new_elevations)
 
-    delta_azimuth = new_azimuths-azimuths
-    delta_elevation = new_elevations -elevations    
-    for i, quiver in enumerate(quivers):
-        quiver.remove()
-        quiver = ax.quiver(oldPositions[i][0], oldPositions[i][1], oldPositions[i][2],
-                           newPositions[i][0] - oldPositions[i][0], newPositions[i][1] - oldPositions[i][1], newPositions[i][2] - oldPositions[i][2],
-                           color='green')
-        quivers[i] = quiver
-    textU.set_text(f'u: {u}')
-    textTheta.set_text(f'theta: {np.degrees(theta)}')
-    textTime.set_text(f'time:{time}')
-    return quivers + [textU, textTheta,textTime]
 
 
 ## Setup
@@ -235,7 +178,7 @@ XU = -0.02
 g = 9.80665
 XQ = 0.6674
 observerOrigin = np.array([0,0,0])
-xRange = (1, 10)  # X range on the ground
+xRange = (3, 10)  # X range on the ground
 yRange = (-27, 27)  # Y range on the ground
 zHeight = (-5,-5)  # Z height for ground plane
 nPoints = 20 # Number of points in each dimension
@@ -245,6 +188,7 @@ points_world = create_ground_points(xRange, yRange, zHeight, nPoints)
 
 ## Create input
 t = np.linspace(0,4,600)
+t = np.arange(0,4.5,0.1)
 dt = t[1] - t[0]
 input = -1/100 * np.sin((1/2 * 3)*np.pi*t)
 # input = -1/100 * np.sin((1/2 * 10)*np.pi*t)
@@ -259,7 +203,8 @@ ax=plt.gca()
 behaviour.plot(kind="line", x="Time", y="Input", ax=ax)
 plt.title("Variation of Control Input over time")
 plt.xlabel('Time [s]')
-plt.ylabel('Control Input [rad/s]')
+plt.ylabel('Control Input [rad s]')
+ax.yaxis.set_major_formatter( ticker.FormatStrFormatter('%.3f'))
 plt.savefig("Visuals/Input")
 plt.legend()
 
@@ -327,6 +272,7 @@ ax_dEleDTheta.set_xlabel("Time [s]")
 ax_dEleDTheta.set_ylabel("dElevation_dTheta [-]")
 
 
+# Analyse one FoV
 xVals = np.arange(xRange[0],xRange[1]+1,1)
 yVals = xVals * np.tan(np.radians(140/2))
 for i,xPos in enumerate(xVals):
@@ -383,7 +329,7 @@ ax_dEleDTheta.set_xlabel("Time [s]")
 ax_dEleDTheta.set_ylabel("dElevation_dTheta [-]")
 
 
-
+# Analyse all FoVs
 baseCase = np.array([1,1,-5])
 xVals = np.linspace(xRange[0], xRange[1], nPoints)
 FoVRange = np.arange(10,160,10)
@@ -455,11 +401,14 @@ plt.plot(FoVRange,allMeans_dEleDU,label="dEle_d(Udt)",marker = "x")
 plt.plot(FoVRange,allMeans_dEleDTheta,label="dEle_dTheta",marker = "x")
 plt.legend()
 plt.savefig("Visuals/FOVBehaviour_sine")
-plt.show()
+# plt.show()
 plt.close('all')
 for i,angle in enumerate(FoVRange):
     allCoords,allX,allY = generateCoords(angle,100,xRange[0],xRange[1],0.1)
     print("angle ", angle, " points ", len(allCoords))
+
+
+
 
 # Setting up figures for max movement analysis
 fig_dAzDU = plt.figure(figure)
@@ -492,6 +441,8 @@ ax_best_dEleDTheta = fig_dEleDTheta.add_subplot(111)
 ax_best_dEleDTheta.set_title("Best dElevation_dTheta wrt FoV")
 ax_best_dEleDTheta.set_xlabel("Time [s]")
 ax_best_dEleDTheta.set_ylabel("dElevation_dTheta [-]")
+
+# Calculate max value
 best_DAzDu = []
 best_DAzDTheta = []
 best_DEleDU = []
@@ -523,35 +474,11 @@ fig_dAzDTheta.savefig("Visuals/dAzDTheta_best.png")
 fig_dEleDTheta.savefig("Visuals/dEleDTheta_best.png")
 fig_dEleDU.savefig("Visuals/dEleDU_best.png")
 
-plt.show() 
-exit()
+# plt.show() 
+# exit()
 plt.close('all')
 
-# Sphere plot
-print("Starting sphere stuff now")
-fig = plt.figure()
-ax = fig.add_subplot(111, projection='3d')
-# Plot the sphere for reference
-u = np.linspace(0, 2 * np.pi, 100)
-v = np.linspace(0, np.pi, 100)
-x_sphere = r * np.outer(np.cos(u), np.sin(v))
-y_sphere = r * np.outer(np.sin(u), np.sin(v))
-z_sphere = r * np.outer(np.ones(np.size(u)), np.cos(v))
-ax.plot_surface(x_sphere, y_sphere, z_sphere, color='cyan', alpha=0.1)
-ax.set_xlabel('X')
-ax.set_ylabel('Y')
-ax.set_zlabel('Z')
 
-quivers = [ax.quiver(0, 0, 0, 0, 0, 0, color='green') for _ in range(len(points_world))]
-textTime = ax.text2D(0.05, 0.85, "", transform=ax.transAxes)
-textU = ax.text2D(0.05, 0.95, "", transform=ax.transAxes)
-textTheta = ax.text2D(0.05, 0.90, "", transform=ax.transAxes)
-
-## Saving sphere plot
-# anime = ani.FuncAnimation(fig,functools.partial(updateValues,df=behaviour),frames=len(t),blit=False)
-# anime.save('animation.gif', writer='pillow', fps=10) 
-# writervideo = ani.PillowWriter(fps=60) 
-# anime.save('animation.gif', writer=writervideo)
 
 
 

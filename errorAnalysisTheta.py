@@ -4,9 +4,13 @@ import csv
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
+
+# Choose file
 folder = "Heli_Sim/Assets/StreamingAssets/Data/"
 filename = folder + "export_leam160,0723343,7331_theta_140.csv"
 file = open(filename)
+
+# Read file
 Time=[]
 controlTheta = []
 ffTheta =[]
@@ -34,6 +38,8 @@ thetaDfTrunc = thetaDf.truncate(before=thetaDf[Time>=30].iloc[0,0])
 rmse = np.sqrt(np.sum(thetaDfTrunc["error"]**2) / len(thetaDfTrunc["error"]))
 print(rmse)
 file.close()
+
+# Load forcing function
 filename = "Heli_Sim/Assets/Scripts/forcing_func_theta.csv"
 file = open(filename)
 ff=[]
@@ -43,27 +49,14 @@ for row in csvreader:
     if(row[1] != "forcing function"):
         ff.append(float(row[1]))
 print("Done reading")
-file.close
+file.close()
 
-ffChange = [ff[0]]
-for i in range(1,len(ff)):
-    ffChange.append(ff[i] - ff[i-1])
-
-ffChange = np.array(ffChange)
-ffNormalised = []
-for val in ffTheta:
-    if val !=0:
-        ffNormalised.append(-1* val)
-
-ffNormalised = np.array(ffNormalised)
+# Plot results
 plt.figure(1)
 plt.title("Theta")
 plt.plot(Time,controlTheta,label="CV")
-# plt.plot(Time,-1 *ffTheta,label="FF")
-plt.plot(t,ff,label="actual ff")
 plt.plot(Time,actualPitch,label="actual pitch")
-# plt.plot(t,ffNormalised[:-1],label="ff")
-# plt.plot(t,ffChange,label="check")
+
 plt.legend()
 
 

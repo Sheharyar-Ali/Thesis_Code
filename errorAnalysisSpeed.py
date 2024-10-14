@@ -3,9 +3,13 @@ import csv
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
+
+# Choose dataset
 folder = "Heli_Sim/Assets/StreamingAssets/Data/"
 filename = folder + "export_leam159,0438341,17514,6339_actual_120.csv"
 file = open(filename)
+
+# Read Data
 Time=[]
 controlVelocity = []
 ffVelocity =[]
@@ -34,7 +38,7 @@ print(rmse)
 
 
 
-
+# Load forcing function file
 filename = "Heli_Sim/Assets/Scripts/forcing_func.csv"
 file = open(filename)
 ff=[]
@@ -46,12 +50,11 @@ for row in csvreader:
 print("Done reading")
 file.close()
 
+# Plot results
 plt.figure(1)
 plt.title("Velocities")
 plt.plot(Time,controlVelocity,label="CV")
 plt.plot(Time,ffVelocity,label="FF")
-plt.plot(t,ff,label="actual")
-# plt.plot(Time,heliVelocity,label="total")
 plt.legend()
 
 plt.figure(2)

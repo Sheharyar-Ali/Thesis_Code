@@ -4,12 +4,13 @@ import numpy as np
 import pandas as pd
 import sympy as sy
 import itertools
-from scipy.integrate import cumtrapz
+from scipy.integrate import cumulative_trapezoid as cumtrapz
 
 def RMSE(data):
     error = np.zeros_like(data) - data
     rmse = np.sqrt(np.sum(error**2) / len(error))
     return rmse
+
 def readFileU(filename):
     file = open(filename)
     Time=[]
@@ -90,7 +91,7 @@ def Analytical(deltaT,z,xVal,yVal,thetaVals,uVals):
     return Eval_dAzdU, Eval_dAzdTheta, Eval_dEledU,Eval_dEledTheta
 
 
-
+# Get example data set
 readFolder = "ExpData/ILAH/"
 fileName = "export_ilah176,1395362,3279552,7027_actual_140.csv"
 Time,controlInput,_,_,velocity = readFileU(readFolder+fileName)
@@ -106,6 +107,7 @@ for i in range(0,len(finalAngle)-1):
 print(len(currentEuler))
 
 
+# Remove copies
 velFixed =[]
 tFixed=[]
 pitchFixed=[]
@@ -119,10 +121,37 @@ velFixed=np.array(velFixed)
 pitchFixed = np.array(pitchFixed)    
 pitchRad = pitchFixed * (np.pi/180)
 
-df = pd.DataFrame({"Time": tFixed, "V": velFixed , "Pitch_Deg": pitchFixed, "Pitch_Rad": pitchRad})
+# Sample data at specifc rate for flow visualisation in Unity
+tSampled=[0]
+vSampled=[0]
+pitchSampled = [0]
+previous = 0
+sampleRate = 0.2
+for i in range(1,len(Time)):
+    if(Time[i] >= previous +sampleRate):
+        tSampled.append(Time[i])
+        vSampled.append(velocity[i])
+        pitchSampled.append(currentEuler[i])
+        previous = Time[i]
+tSampled=np.array(tSampled)
+vSampled=np.array(vSampled)
+pitchSampled = np.array(pitchSampled)
+pitchRadSampled = pitchSampled * (np.pi/180)
+thetaDot = np.diff(a=pitchSampled,prepend=0)
+xRange=[4,8]
+step = 0.2
+coords,_,_ = generateCoords(140,100,xRange[0],xRange[1],step)
+
+
+xVals = np.arange(xRange[0],xRange[1]+1,1)
+yVals = xVals * np.tan(np.radians(15/2))
+
+# Export to Unity
+df = pd.DataFrame({"Time": tSampled, "V": vSampled , "Pitch_Deg": pitchSampled, "Pitch_Rad": pitchRadSampled, "Theta_dot_deg": thetaDot})
 df.to_csv("Heli_Sim/Assets/Resources/actualMove.csv")
 
-
+exit()
+# Plot Velocity and Pitch
 plt.figure(figure)
 figure+=1
 plt.title("Progression of Velocity")
@@ -137,14 +166,11 @@ plt.title("Progression of Pitch")
 plt.ylabel("Pitch [deg]")
 plt.xlabel("Time [s]")
 plt.plot(Time,currentEuler,label="Actual")
-# plt.plot(Time,Az_t * (180/np.pi),label="new")
-plt.savefig("Visuals/ThetaExp")
 
 
-# Over all points
-xRange=[1,8]
-step = 0.2
-coords,_,_ = generateCoords(140,100,xRange[0],xRange[1],step)
+
+# Calculate trend in partial derivatives across all points
+
 alldAzDu,alldAzdTheta, alldEledU,alldEledTheta = [],[],[],[]
 for pos in coords:
     dAzdU, dAzdTheta, dEledU,dEledTheta = Analytical(tFixed[1] - tFixed[0], pos[2],pos[0],pos[1],pitchRad,velFixed) 
@@ -152,6 +178,7 @@ for pos in coords:
     alldAzdTheta.append(dAzdTheta)
     alldEledU.append(dEledU )
     alldEledTheta.append(dEledTheta)
+    
 
 meanDAzDU = np.mean(alldAzDu,axis=0)
 meanDAzDTheta = np.mean(alldAzdTheta,axis=0)
@@ -200,9 +227,9 @@ plt.plot(tFixed,meanDEleDTheta,label="dElevation_dTheta")
 plt.legend()
 plt.savefig("Visuals/dElevation_Exp")
 
-# Over points at 90 deg
+# Calculate trend in partial derivatives  at 90 deg
 print("90 Deg now")
-plt.close('all')
+# plt.close('all')
 fig_dAzDU = plt.figure(figure)
 figure+=1
 ax_dAZDU = fig_dAzDU.add_subplot(111)
@@ -244,6 +271,7 @@ for i,xPos in enumerate(xVals):
     alldAzdTheta.append(dAzdTheta)
     alldEledU.append(dEledU )
     alldEledTheta.append(dEledTheta)
+    
 
 meanDAzDU = np.mean(alldAzDu,axis=0)
 meanDAzDTheta = np.mean(alldAzdTheta,axis=0)
@@ -254,13 +282,7 @@ stdDAzDTheta = RMSE(meanDAzDTheta)
 stdDEleDu = RMSE(meanDEleDU)
 stdDEleDTheta = RMSE(meanDEleDTheta)
 
-Az_t_theta = cumtrapz(meanDAzDTheta,pitchFixed,initial=0)
-Az_t_U = cumtrapz(meanDAzDU,(velFixed * (tFixed[1] - tFixed[0])),initial=0)
 
-#print(alldAzDu)
-print("RMSE")
-print(stdDAzDu,stdDAzDTheta)
-print(stdDEleDu,stdDEleDTheta)
 print("Means")
 print(np.mean(meanDAzDU), np.mean(meanDAzDTheta))
 print(np.mean(meanDEleDU),np.mean(meanDEleDTheta))
@@ -289,7 +311,7 @@ plt.legend()
 plt.savefig("Visuals/dElevation_90")    
 
 
-# Over points at 15 deg
+# Calculate trend in partial derivatives  at 15 deg
 print("15 Deg now")
 xVals = np.arange(xRange[0],xRange[1]+1,1)
 yVals = xVals * np.tan(np.radians(15/2))
@@ -300,6 +322,7 @@ for i,xPos in enumerate(xVals):
     alldAzdTheta.append(dAzdTheta)
     alldEledU.append(dEledU )
     alldEledTheta.append(dEledTheta)
+    
 
 meanDAzDU = np.mean(alldAzDu,axis=0)
 meanDAzDTheta = np.mean(alldAzdTheta,axis=0)
@@ -310,13 +333,7 @@ stdDAzDTheta = RMSE(meanDAzDTheta)
 stdDEleDu = RMSE(meanDEleDU)
 stdDEleDTheta = RMSE(meanDEleDTheta)
 
-Az_t_theta = cumtrapz(meanDAzDTheta,pitchFixed,initial=0)
-Az_t_U = cumtrapz(meanDAzDU,(velFixed * (tFixed[1] - tFixed[0])),initial=0)
 
-#print(alldAzDu)
-print("RMSE")
-print(stdDAzDu,stdDAzDTheta)
-print(stdDEleDu,stdDEleDTheta)
 print("Means")
 print(np.mean(meanDAzDU), np.mean(meanDAzDTheta))
 print(np.mean(meanDEleDU),np.mean(meanDEleDTheta))
@@ -353,7 +370,7 @@ plt.plot(tFixed,meanDEleDU,label="dElevation_d(Udt)")
 plt.plot(tFixed,meanDEleDTheta,label="dElevation_dTheta")
 plt.legend()
 plt.savefig("Visuals/dElevation_15")
-plt.show()
+plt.close('all')
 # # angleWanted = pushValue * maxPitchRate / maxVal;
 # # var thetaDot = angleWanted * M_theta1s;
 # # finalAngle = thetaDot * dtPython;
