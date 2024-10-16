@@ -77,7 +77,7 @@ g = 9.80665
 XQ = 0.6674
 behaviour = RealisticMovement(input,MTheta1s,MQ,XTheta1s,g,XU,t)
 behaviour.insert(3,"Theta_deg",np.degrees(behaviour["Theta"]))
-thetaDot = np.diff(a=behaviour['Theta_deg'],prepend=0)
+thetaDot = np.diff(a=behaviour['Theta_deg'],prepend=0) / np.diff(a=behaviour["Time"],prepend=0)
 behaviour.insert(6,"Theta_dot_deg", thetaDot)
 xRange = [2,30]
 step = 3

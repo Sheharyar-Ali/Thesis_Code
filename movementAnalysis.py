@@ -120,6 +120,7 @@ tFixed=np.array(tFixed)
 velFixed=np.array(velFixed)
 pitchFixed = np.array(pitchFixed)    
 pitchRad = pitchFixed * (np.pi/180)
+thetaDotFixed = np.diff(a=pitchFixed,prepend=0) / np.diff(a=tFixed,prepend=0)
 
 # Sample data at specifc rate for flow visualisation in Unity
 tSampled=[0]
@@ -137,7 +138,7 @@ tSampled=np.array(tSampled)
 vSampled=np.array(vSampled)
 pitchSampled = np.array(pitchSampled)
 pitchRadSampled = pitchSampled * (np.pi/180)
-thetaDot = np.diff(a=pitchSampled,prepend=0)
+thetaDot = np.diff(a=pitchSampled,prepend=0) / np.diff(a=tSampled,prepend=0)
 xRange=[4,8]
 step = 0.2
 coords,_,_ = generateCoords(140,100,xRange[0],xRange[1],step)
@@ -146,10 +147,12 @@ coords,_,_ = generateCoords(140,100,xRange[0],xRange[1],step)
 xVals = np.arange(xRange[0],xRange[1]+1,1)
 yVals = xVals * np.tan(np.radians(15/2))
 
-# Export to Unity
+# Export to Unity for Flow vectors
 df = pd.DataFrame({"Time": tSampled, "V": vSampled , "Pitch_Deg": pitchSampled, "Pitch_Rad": pitchRadSampled, "Theta_dot_deg": thetaDot})
 df.to_csv("Heli_Sim/Assets/Resources/actualMove.csv")
 
+df_full = pd.DataFrame({"Time": tFixed, "V": velFixed , "Pitch_Deg": pitchFixed, "Pitch_Rad": pitchRad, "Theta_dot_deg": thetaDotFixed})
+df_full.to_csv("Heli_Sim/Assets/Resources/actualMoveFPS.csv")
 exit()
 # Plot Velocity and Pitch
 plt.figure(figure)
